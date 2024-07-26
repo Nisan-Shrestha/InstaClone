@@ -1,0 +1,56 @@
+<form class="innerForm" id="signupform">
+  <input
+    type="text"
+    name="email"
+    id="signup_email"
+    placeholder="Email"
+    class="form-input"
+  />
+  <span id="emailError" class=""></span>
+
+  <input
+    type="text"
+    name="fullname"
+    id="signup_fullname"
+    placeholder="Full Name"
+    class="form-input"
+  />
+  <span id="fullnameError" class=""></span>
+
+  <input
+    type="text"
+    name="username"
+    id="signup_username"
+    placeholder="Username"
+    class="form-input"
+  />
+  <span id="usernameError" class=""></span>
+  <input
+    type="password"
+    name="password"
+    id="signup_password"
+    placeholder="Password"
+    class="form-input"
+  />
+  <span id="passwordError" class="form-error"></span>
+
+  <input
+    type="password"
+    name="password"
+    id="signup_password_recheck"
+    placeholder="Password"
+    class="form-input"
+  />
+  <span id="passwordRecheckError" class="form-error"></span>
+
+  <button type="submit" class="CTA CTA--primary">Sign Up</button>
+
+  <div className="divider">
+    <span class="divider-line"></span>
+    <span class="divider-text">OR</span>
+    <span class="divider-line"></span>
+  </div>
+  <a id="GoogleLoginLink">
+    <img src="assests/icons/SignUpGoogle.png" class="CTA--image" />
+  </a>
+</form>
