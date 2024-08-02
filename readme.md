@@ -23,7 +23,7 @@
     npm run migrate
     ```
 
-  In another terminal run frontend
+- In another terminal run frontend
 
   ```bash
   cd InstaClone/Frontend
