@@ -80,7 +80,7 @@ export class UserSummary {
         import.meta.env.VITE_BACKEND_URL +
         `/api/follow/${userDetails.username}`,
       method: "POST",
-      header: {
+      headers: {
         "Content-Type": "application/json",
       },
     });
@@ -115,7 +115,7 @@ export class UserSummary {
         import.meta.env.VITE_BACKEND_URL +
         `/api/unfollow/${userDetails.username}`,
       method: "DELETE",
-      header: {
+      headers: {
         "Content-Type": "application/json",
       },
     });

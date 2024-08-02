@@ -1,3 +1,4 @@
+import { Create } from "./pages/Create";
 import { Explore } from "./pages/Explore";
 import { HomeFeed } from "./pages/Home";
 import { Login } from "./pages/Login";
@@ -21,6 +22,9 @@ router.addRoute("/login", async () => {
 router.addRoute("/signup", async () => {
   await new Signup().load();
 });
+router.addRoute("/create", async () => {
+  await Create.load();
+});
 router.addRoute("/explore/:tag", async (params) => {
   if (params) {
     await new Explore().load(params.tag);
@@ -36,5 +40,6 @@ router.addRoute("/p/:postId", async (params) => {
     await PostModal.load(params.postId);
   }
 });
+
 // router.addRoute("/about", async () => await fetchView("/views/b.html"));
 // router.addRoute("/contact", async () => await fetchView("/views/c.html"));

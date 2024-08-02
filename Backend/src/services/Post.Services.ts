@@ -168,16 +168,16 @@ export async function handlePostUpload(
     throw new BadRequest("No photos found in the request");
   }
 
-  let createdPost = await PostModel.PostModel.createPost(
-    postDetails,
-    requester
-  );
-
   // TODO: handle error here
   let linkPromises: Promise<string>[] = photos.map(async (photo) => {
     let result = await uploadStream(photo.buffer, "post_media", photo.filename);
     return result.secure_url as string;
   });
+
+  let createdPost = await PostModel.PostModel.createPost(
+    postDetails,
+    requester
+  );
 
   let links: string[] = await Promise.all(linkPromises); // Wait for all the promises to resolve
 

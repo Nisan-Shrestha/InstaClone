@@ -84,7 +84,7 @@ export class Signup {
             {
               url: import.meta.env.VITE_BACKEND_URL + "/auth/signup",
               method: "POST",
-              header: { "Content-Type": "application/json" },
+              headers: { "Content-Type": "application/json" },
               body: formData,
             },
             true,

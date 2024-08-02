@@ -19,6 +19,7 @@
     "vite": "^5.3.4"
   },
   "dependencies": {
+    "cropperjs": "^1.6.2",
     "joi": "^17.13.3"
   }
 }

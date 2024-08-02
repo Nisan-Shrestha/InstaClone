@@ -24,7 +24,8 @@ export const uploadStream = (
       },
       (error, result) => {
         if (error) {
-          reject(error);
+          throw new Error("unable to upload image to Cloudinary: " + error);
+          reject();
         } else {
           resolve(result);
         }

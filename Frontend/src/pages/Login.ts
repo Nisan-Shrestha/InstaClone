@@ -75,7 +75,7 @@ export class Login {
             {
               url: import.meta.env.VITE_BACKEND_URL + "/auth/login",
               method: "POST",
-              header: {
+              headers: {
                 "Content-Type": "application/json",
               },
               body: { username, password },

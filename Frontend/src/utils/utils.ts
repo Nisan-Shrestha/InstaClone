@@ -19,9 +19,9 @@ export async function request(
     url: string;
     method: string;
 
-    header?: object;
+    headers?: object;
     body?: object;
-    other?: object;
+    other?: { contentType: string };
   } = { url: "", method: "GET" },
   allowUnauthorized: boolean = false,
 ): Promise<{ status: string; message: string; payload: any }> {
@@ -45,11 +45,17 @@ export async function request(
       );
     }
   }
+  let body;
+  if (Params.method == "GET") body = null;
+  else if (Params.other?.contentType == "multipart/form-data")
+    body = Params.body;
+  else body = JSON.stringify(Params.body);
 
+  let header = new Headers({ ...Params.headers });
   const response = await fetch(Params.url, {
     method: Params.method,
-    headers: Params.header as HeadersInit,
-    body: Params.method == "GET" ? null : JSON.stringify(Params.body),
+    body: body as BodyInit,
+    headers: header,
     ...Params.other,
     credentials: "include",
   });

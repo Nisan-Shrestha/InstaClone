@@ -42,7 +42,7 @@ export class HomeFeed {
       await request({
         url: import.meta.env.VITE_BACKEND_URL + "/posts/feed",
         method: "GET",
-        header: {
+        headers: {
           "Content-Type": "application/json",
         },
       })

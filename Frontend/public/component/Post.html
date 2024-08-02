@@ -1,31 +1,34 @@
 <!-- component -->
 <div class="w-full min-w-64 max-w-xl p-4">
   <div class="w-full rounded-sm border border-neutral-300">
-    <a class="flex items-center px-4 py-3" data-link data-pfp-wrapper>
-      <img
-        data-pfp
-        get-parent-a
-        class="h-8 w-8 rounded-full"
-        src="/assets/icons/profile.svg"
-        sss
-      />
-      <div get-parent-a class="ml-3">
-        <span
-          data-username
+    <div class="flex justify-between">
+      <a class="flex items-center px-4 py-3" data-link data-pfp-wrapper>
+        <img
+          data-pfp
           get-parent-a
-          class="block text-sm font-semibold leading-tight antialiased"
-          >Username</span
-        >
-        <!-- <span data-username class="text-gray-600 text-xs block">Asheville, North Carolina</span> -->
-      </div>
-    </a>
+          class="h-8 w-8 rounded-full"
+          src="/assets/icons/profile.svg"
+          sss
+        />
+        <div get-parent-a class="ml-3">
+          <span
+            data-username
+            get-parent-a
+            class="block text-sm font-semibold leading-tight antialiased"
+            >Username</span
+          >
+        </div>
+      </a>
+      <button
+        data-delete-post
+        class="block bg-red-600 my-auto p-2 rounded-md text-neutral-200 hover:bg-red-500"
+      >
+        Delete Post
+      </button>
+    </div>
     <!--TODO add carousel here -->
     <div data-carousel-holder class="aspect-square h-3/4 w-auto">
-      <img
-        data-post-media
-        class="h-auto w-full object-contain"
-        src=""
-      />
+      <img data-post-media class="h-auto w-full object-contain" src="" />
     </div>
     <!-- carousel end -->
     <div class="mx-4 mb-2 mt-3 flex items-center justify-between">

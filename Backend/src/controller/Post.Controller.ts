@@ -12,6 +12,7 @@ import { IUser } from "../interfaces/User.Interface";
 import { uploadStream } from "../utils/cloudinary";
 import { IPost } from "../interfaces/Post.interface";
 import exp from "constants";
+import { log } from "console";
 const logger = loggerWithNameSpace("Post Controller");
 
 export async function getPostByID(
@@ -100,6 +101,7 @@ export async function getFeedPosts(
 
 export async function handlePostUpload(req: Request, res: Response) {
   const imageFiles = req.files as { [key: string]: Express.Multer.File[] };
+  console.log("req body", JSON.stringify(req.body));
   let photos: Express.Multer.File[] = imageFiles.photo;
   let requester = req.user;
   let postDetails = req.body as Partial<IPost>;
@@ -108,7 +110,7 @@ export async function handlePostUpload(req: Request, res: Response) {
     requester,
     postDetails
   );
-
+  logger.info(" handlePostUpload done");
   res
     .status(HttpStatusCodes.ACCEPTED)
     .json({ message: "User Found", payload: serviceResponse });

@@ -28,23 +28,32 @@
     <!-- carousel end -->
 
     <div class="relative col-span-1 h-auto w-full pl-4">
-      <header class="border-grey-400 border-b">
-        <a
-          data-link
-          data-pfp-wrapper
-          href="#"
-          class="flex cursor-pointer items-center py-4 text-sm outline-none transition duration-150 ease-in-out focus:border-gray-300 focus:outline-none"
-        >
-          <img
-            data-pfp
-            get-parent-a
-            src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260"
-            class="h-9 w-9 rounded-full object-cover"
-            alt="user"
-          />
-          <p data-username get-parent-a class="ml-2 block font-bold">Paul</p>
-        </a>
-      </header>
+      <div class="border-grey-400 border-b">
+        <div class="mr-2 flex justify-between">
+          <a
+            data-link
+            data-pfp-wrapper
+            href="#"
+            class="flex cursor-pointer items-center py-4 text-sm outline-none transition duration-150 ease-in-out focus:border-gray-300 focus:outline-none"
+          >
+            <img
+              data-pfp
+              get-parent-a
+              src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260"
+              class="h-9 w-9 rounded-full object-cover"
+              alt="user"
+            />
+            <p data-username get-parent-a class="ml-2 block font-bold">Paul</p>
+          </a>
+
+          <button
+            data-delete-post
+            class="my-auto block rounded-md bg-red-600 p-2 text-neutral-200 hover:bg-red-500"
+          >
+            Delete Post
+          </button>
+        </div>
+      </div>
 
       <div class="h-[69%] overflow-auto">
         <div class="py-2">

@@ -55,7 +55,7 @@ export class Explore {
         import.meta.env.VITE_BACKEND_URL +
         `/posts/explore?${tag ? "tag=" + tag + "&" : ""}page=1&size=20`,
       method: "GET",
-      header: {
+      headers: {
         "Content-Type": "application/json",
       },
     });

@@ -1,0 +1,38 @@
+<div
+  id="post-modal"
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+>
+  <div class="w-full max-w-md rounded-lg bg-white p-6">
+    <div class="mb-4 flex items-center justify-between">
+      <h2 class="text-xl font-bold">Create New Post</h2>
+      <button
+        id="close-modal"
+        class="rounded-md p-2 px-4 text-3xl text-gray-500 hover:text-gray-700 hover:shadow-[rgba(17,_17,_26,_0.1)_0px_0px_16px]"
+      >
+        &times;
+      </button>
+    </div>
+    <div id="image-preview" class="mb-4 flex flex-wrap gap-2"></div>
+    <label class="mb-4 block">
+      <span class="sr-only">Choose images</span>
+      <input
+        type="file"
+        id="image-upload"
+        multiple
+        accept="image/*"
+        class="block w-96 text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+      />
+    </label>
+    <textarea
+      id="caption"
+      placeholder="Write a caption..."
+      class="mb-4 h-24 w-full rounded border p-2"
+    ></textarea>
+    <button
+      id="submit-post"
+      class="w-full rounded bg-blue-500 py-2 text-white hover:bg-blue-600 hover:shadow-[0_3px_10px_rgb(0,0,0,0.2)]"
+    >
+      Publish
+    </button>
+  </div>
+</div>

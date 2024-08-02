@@ -19,13 +19,13 @@ export class Hashtag {
 
     parentDiv.appendChild(container);
 
-    container.textContent = name;
+    container.textContent = "#"+name;
     this.setup(name, container);
   }
 
   static setup(name: string, container: HTMLElement) {
     container.addEventListener("click", async () => {
-      router.navigate(`/t/${name}`, window.history.state);
+      router.navigate(`/explore/${name}`, window.history.state);
     });
   }
 }

@@ -13,7 +13,7 @@ export class Comment {
     if (!commentDetails.content) return;
     let newComment = await fetchView("/component/Comment.html");
     let container = document.createElement("div");
-    container.setAttribute("class", "pt-1");
+    container.setAttribute("class", "pt-1 mb-2");
     container.innerHTML = newComment;
 
     parentDiv?.appendChild(container);
@@ -134,7 +134,7 @@ async function enableViewMore(
     {
       url: import.meta.env.VITE_BACKEND_URL + `/comments/childof/${commentId}`,
       method: "GET",
-      header: {
+      headers: {
         "Content-Type": "application/json",
       },
       // body: { username: postDetails.username, postId: postDetails.id },

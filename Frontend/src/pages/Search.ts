@@ -74,7 +74,7 @@ async function getUsers(inputVal: string, resultContainer: HTMLElement) {
   let res = await request({
     url: import.meta.env.VITE_BACKEND_URL + `/user/?q=${inputVal}&size=20`,
     method: "GET",
-    header: {
+    headers: {
       "Content-Type": "application/json",
     },
   });
@@ -94,7 +94,7 @@ async function getHastags(inputVal: string, resultContainer: HTMLElement) {
     url:
       import.meta.env.VITE_BACKEND_URL + `/api/hastags/?q=${inputVal}&size=20`,
     method: "GET",
-    header: {
+    headers: {
       "Content-Type": "application/json",
     },
   });

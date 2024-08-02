@@ -43,11 +43,15 @@ export class PostModal {
       await request({
         url: import.meta.env.VITE_BACKEND_URL + `/posts/${postId}`,
         method: "GET",
-        header: {
+        headers: {
           "Content-Type": "application/json",
         },
       })
     ).payload;
+    if (!postDetails) {
+      router.navigate("/", window.history.state);
+      return;
+    }
     console.log("postDetails:", postDetails);
     let imgTag = container.querySelector("img[data-pfp]") as HTMLImageElement;
     if (postDetails.pfpUrl) imgTag.setAttribute("src", postDetails.pfpUrl);
@@ -119,6 +123,36 @@ export class PostModal {
         event.preventDefault();
       });
     });
+
+   
+    const delBtn = container.querySelector(
+      "[data-delete-post]",
+    ) as HTMLButtonElement;
+    if (postDetails.username !== localStorage.getItem("username")) {
+      delBtn.remove();
+    }
+    delBtn.addEventListener("click", async () => {
+      if (confirm("Are you sure to delete this post?")) {
+        alert("Thanks for confirming");
+        let res = await request(
+          {
+            url: import.meta.env.VITE_BACKEND_URL + `/posts/${postDetails.id}/`,
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+          true,
+        );
+        if (res.status == "success") {
+          container.remove();
+          window.history.back();
+        }
+      } else {
+        alert("Why did you press cancel? You should have confirmed");
+      }
+    });
+
     const likeBtn = container.querySelector(
       "[data-like-button]",
     ) as HTMLButtonElement;
@@ -141,7 +175,7 @@ export class PostModal {
             url:
               import.meta.env.VITE_BACKEND_URL + `/api/${postDetails.id}/like`,
             method: "POST",
-            header: {
+            headers: {
               "Content-Type": "application/json",
             },
             // body: { username: postDetails.username, postId: postDetails.id },
@@ -165,7 +199,7 @@ export class PostModal {
               import.meta.env.VITE_BACKEND_URL +
               `/api/${postDetails.id}/unlike`,
             method: "DELETE",
-            header: {
+            headers: {
               "Content-Type": "application/json",
             },
             body: { username: postDetails.username, postId: postDetails.id },
@@ -201,7 +235,7 @@ export class PostModal {
             url:
               import.meta.env.VITE_BACKEND_URL + `/api/${postDetails.id}/save`,
             method: "POST",
-            header: {
+            headers: {
               "Content-Type": "application/json",
             },
             body: { username: postDetails.username, postId: postDetails.id },
@@ -220,7 +254,7 @@ export class PostModal {
               import.meta.env.VITE_BACKEND_URL +
               `/api/${postDetails.id}/unsave`,
             method: "DELETE",
-            header: {
+            headers: {
               "Content-Type": "application/json",
             },
             body: { username: postDetails.username, postId: postDetails.id },
@@ -263,7 +297,7 @@ export class PostModal {
           import.meta.env.VITE_BACKEND_URL +
           `/comments/allparent/${postDetails.id}`,
         method: "GET",
-        header: {
+        headers: {
           "Content-Type": "application/json",
         },
         // body: { username: postDetails.username, postId: postDetails.id },
@@ -320,7 +354,7 @@ export class PostModal {
       {
         url: import.meta.env.VITE_BACKEND_URL + `/comments/${postDetails.id}`,
         method: "POST",
-        header: {
+        headers: {
           "Content-Type": "application/json",
         },
         body: { content, postId: postDetails.id },
@@ -342,7 +376,7 @@ export class PostModal {
       {
         url: import.meta.env.VITE_BACKEND_URL + "/comments/" + commentId,
         method: "PUT",
-        header: {
+        headers: {
           "Content-Type": "application/json",
         },
         body: { content, postId: postDetails.id },
@@ -366,7 +400,7 @@ export class PostModal {
       {
         url: import.meta.env.VITE_BACKEND_URL + `/comments/${postDetails.id}`,
         method: "POST",
-        header: {
+        headers: {
           "Content-Type": "application/json",
         },
         body: { content, postId: postDetails.id, parentId: commentId },
