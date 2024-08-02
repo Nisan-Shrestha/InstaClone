@@ -1,0 +1,9 @@
+services:
+  backend:
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+        - action: rebuild
+          path: ./package.json

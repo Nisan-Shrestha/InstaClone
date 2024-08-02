@@ -1,0 +1,53 @@
+version: '3.8'
+services:
+  backend:
+    container_name: instaClone
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    # image: s0skai/backend_insta:latest
+    # env_file: './Backend/.env'
+
+    environment:
+      - PORT=${PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - TZ="Asia/Kathmandu"
+    ports:
+      - ${PORT}:${PORT}
+    # command: >
+    #   sh -c "ln -snf /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime &&  echo ${TIME_ZONE} > /etc/timezone && npm run start"
+    # volumes:
+    #   - .:/app
+    depends_on:
+      - db_insta
+
+  db_insta:
+    container_name: pg_insta
+    image: postgres
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - pg_data_insta:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+  pgadmin_insta:
+    container_name: pgadmin_insta
+    image: dpage/pgadmin4:8.9
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_MAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PW}
+    ports:
+      - "5050:80"
+    restart: always
+    volumes:
+      - pgadmin_data_insta:/var/lib/pgadmin
+    depends_on:
+      - db_insta
+
+volumes:
+  pg_data_insta:
+  pgadmin_data_insta:
