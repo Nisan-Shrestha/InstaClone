@@ -1,0 +1,120 @@
+<div id="bio-page" class="w-10/12 max-w-4xl">
+  <!--body start-->
+  <!--profile data-->
+  <div class="h-auto w-full bg-gray-100">
+    <div class="flex w-full flex-wrap md:flex-row-reverse">
+      <div class="w-full p-4 text-center md:w-3/4">
+        <div class="pl-4 pt-3 text-left">
+          <span data-username class="mr-2 text-2xl text-gray-700"
+            >Username</span
+          >
+          <span class="mr-2 text-base font-semibold text-gray-700">
+            <button
+              data-edit-button
+              class="rounded border border-gray-600 bg-transparent px-4 py-2 text-sm font-semibold text-gray-700 hover:border-transparent hover:bg-blue-500 hover:text-white"
+            >
+              Edit Profile
+            </button>
+          </span>
+          <!-- <span class="text-base font-semibold text-gray-700">
+            <button
+              class="rounded-full border-transparent p-1 text-gray-700 hover:text-blue-600 focus:text-gray-600 focus:outline-none"
+              aria-label="Notifications"
+            >
+              <svg
+                class="h-8 w-8"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                />
+                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          </span> -->
+        </div>
+
+        <div class="pl-4 pt-3 text-left">
+          <span class="mr-2 text-base font-normal text-gray-700">
+            <span class="font-semibold" data-post-count>123</span> posts
+          </span>
+          <span class="mr-2 text-base font-normal text-gray-700">
+            <span class="font-semibold" data-follower-count>456</span> followers
+          </span>
+          <span class="text-base font-normal text-gray-700">
+            <span class="font-semibold" data-following-count>789</span>
+            following
+          </span>
+        </div>
+
+        <div class="pl-4 pt-3 text-left">
+          <span data-fullname class="mr-2 text-lg font-bold text-gray-700"
+            >John Doe</span
+          >
+        </div>
+
+        <div class="pl-4 pt-3 text-left">
+          <p data-bio class="mr-2 text-base font-medium">The Bio Goes Here</p>
+          <!-- <p class="mr-2 text-base font-medium text-gray-700">
+            https://www.behance.net/hiravesona7855
+          </p> -->
+        </div>
+      </div>
+
+      <div class="p-4 text-center md:w-1/4">
+        <img
+          data-pfp
+          class="h-40 w-40 rounded-full object-cover shadow-[rgba(0,_0,_0,_0.25)_0px_25px_50px_-12px]"
+          src="/assets/icons/profile.svg"
+          alt
+        />
+      </div>
+    </div>
+
+    <!--status show icon-->
+
+    <hr class="mt-16 border-gray-500" />
+    <!-- <hr class="border-t-1 ml-64 w-20  border-gray-800" /> -->
+
+    <!--post icon and title-->
+    <div class="flex flex-row justify-center gap-20">
+      <!-- posts -->
+
+      <button
+        data-posts-button
+        class="mx-2 flex items-center border-t border-transparent border-t-gray-800 px-2 py-6 text-center text-gray-600 hover:text-blue-600 focus:text-gray-600 focus:outline-none"
+      >
+        <img src="/assets/icons/posts.svg" class="h-6 w-6" alt="" />
+        <span class="mx-4 text-sm font-medium">Posts</span>
+      </button>
+      <button
+        data-liked-button
+        class="mx-2 flex items-center border-transparent border-t-gray-800 px-2 py-6 text-center text-gray-600 hover:text-blue-600 focus:text-gray-600 focus:outline-none"
+      >
+        <img src="/assets/icons/like.svg" class="h-6 w-6" alt="" />
+        <span class="mx-4 text-sm font-medium">Liked</span>
+      </button>
+
+      <button
+        data-saved-button
+        class="mx-2 flex items-center border-transparent border-t-gray-800 px-2 py-6 text-center text-gray-600 hover:text-blue-600 focus:text-gray-600 focus:outline-none"
+      >
+        <img src="/assets/icons/save.svg" class="h-6 w-6" alt="" />
+        <span class="mx-4 text-sm font-medium">Saved</span>
+      </button>
+    </div>
+    <div>
+      <div
+        class="flex flex-1 basis-10/12 flex-col items-center bg-gray-100 pt-8"
+        id="TabContainer"
+      >
+        <!-- insert posts -->
+      </div>
+    </div>
+  </div>
+</div>

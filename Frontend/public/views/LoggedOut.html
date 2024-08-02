@@ -1,28 +1,32 @@
-<nav class="nav">
-  <a href="/" data-link
-    ><img
-      src="/assests/icons/Instagram_Full.png"
-      alt="Instagram Logo Full"
-      srcset=""
-  /></a>
-  <div class="flex flex-col">
-    <a href="/login" data-link>Login</a>
-    <a href="/signup" data-link>Sign Up</a>
-  </div>
-</nav>
-<section>
+<section class="flex h-full flex-col justify-center">
   <container>
-    <div>
-      <!-- <img src="/assests/icons/Phone.png" alt="Instagram Logo Full" /> -->
-    </div>
-    <div class="CTA">
-      <img src="/assests/icons/Instagram_Full.png" alt="Instagram Logo Full" />
-      <div id="formHolder">
-        <!-- append form here -->
+    <div class="c flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+      <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+        <a data-link href="/">
+          <img
+            get-parent-a
+            class="mx-auto h-10 w-auto"
+            src="/assets/icons/Instagram_Full.png"
+            alt="Your Company"
+          />
+        </a>
+        <h2
+          class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900"
+        >
+          Log in to your account
+        </h2>
       </div>
-    </div>
-    <div class="CTA">
-      <div id="formAltCTA"></div>
+
+      <div
+        class="mt-10 rounded-md bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.12)] sm:mx-auto sm:w-full sm:max-w-sm"
+        id="formHolder"
+      >
+        <!-- Append main form here -->
+      </div>
+
+      <div class="mt-10 text-center text-sm text-gray-500">
+        <div id="formAltCTA"></div>
+      </div>
     </div>
   </container>
 </section>

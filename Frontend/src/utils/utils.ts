@@ -3,7 +3,7 @@ import { router } from "../main";
 export async function fetchView(url: string): Promise<string> {
   const response = await fetch(url);
   let text = await response.text();
-  // console.log("fetched " + url, "\n", text);
+  console.log("fetched " + url, "\n");
   return text;
 }
 
@@ -75,4 +75,29 @@ export async function request(
   //   console.error(err);
   //   return { status: "error", message: "Error Occured", payload: err };
   // }
+}
+
+export function updateNavbar(tab: string) {
+  const icons = document.querySelectorAll("[data-nav-icon]");
+  icons.forEach((icon) => {
+    icon.classList.remove("active");
+    let iconName = icon.getAttribute("data-nav-icon");
+    icon.setAttribute("src", `/assets/icons/${iconName}.svg`);
+  });
+  const activeIcon = document.querySelector(
+    `[data-nav-icon="${tab}"]`,
+  ) as HTMLImageElement;
+  activeIcon?.classList.add("active");
+  activeIcon.setAttribute("src", `/assets/icons/${tab}-active.svg`);
+  let profileAnchor = document.querySelector(
+    "[data-profile-link]",
+  ) as HTMLAnchorElement;
+  profileAnchor.setAttribute("href", "/u/" + getCookie("username"));
+  let profImg = profileAnchor.querySelector(
+    "img[data-nav-icon]",
+  ) as HTMLImageElement;
+  let url = decodeURIComponent(getCookie("pfpUrl") as string);
+  console.log(url);
+  if (url == "empty") url = "/assets/icons/profile.svg";
+  profImg.setAttribute("src", url);
 }

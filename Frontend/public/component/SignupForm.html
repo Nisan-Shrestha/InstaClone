@@ -1,56 +1,122 @@
-<form class="innerForm" id="signupform">
-  <input
-    type="text"
-    name="email"
-    id="signup_email"
-    placeholder="Email"
-    class="form-input"
-  />
-  <span id="emailError" class=""></span>
-
-  <input
-    type="text"
-    name="fullname"
-    id="signup_fullname"
-    placeholder="Full Name"
-    class="form-input"
-  />
-  <span id="fullnameError" class=""></span>
-
-  <input
-    type="text"
-    name="username"
-    id="signup_username"
-    placeholder="Username"
-    class="form-input"
-  />
-  <span id="usernameError" class=""></span>
-  <input
-    type="password"
-    name="password"
-    id="signup_password"
-    placeholder="Password"
-    class="form-input"
-  />
-  <span id="passwordError" class="form-error"></span>
-
-  <input
-    type="password"
-    name="password"
-    id="signup_password_recheck"
-    placeholder="Password"
-    class="form-input"
-  />
-  <span id="passwordRecheckError" class="form-error"></span>
-
-  <button type="submit" class="CTA CTA--primary">Sign Up</button>
-
-  <div className="divider">
-    <span class="divider-line"></span>
-    <span class="divider-text">OR</span>
-    <span class="divider-line"></span>
+<form class="space-y-6" id="signupform">
+  <div>
+    <label
+      for="signup_email"
+      class="block text-sm font-medium leading-6 text-gray-900"
+      >Email Address</label
+    >
+    <div>
+      <input
+        type="text"
+        name="email"
+        id="signup_email"
+        placeholder="Doe.John@example.com"
+        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+      />
+      <span
+        id="emailError"
+        class="hidden w-full rounded-md py-0.5 text-red-700 sm:text-sm sm:leading-6"
+      ></span>
+    </div>
   </div>
-  <a id="GoogleLoginLink">
-    <img src="assests/icons/SignUpGoogle.png" class="CTA--image" />
-  </a>
+  <div>
+    <label
+      for="signup_email"
+      class="block text-sm font-medium leading-6 text-gray-900"
+      >Full Name</label
+    >
+    <div>
+      <input
+        type="text"
+        name="fullname"
+        id="signup_fullname"
+        placeholder="John Joe Doe"
+        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+      />
+      <span
+        id="fullnameError"
+        class="hidden w-full rounded-md py-0.5 text-red-700 sm:text-sm sm:leading-6"
+      ></span>
+    </div>
+  </div>
+
+  <div>
+    <label
+      for="signup_username"
+      class="block text-sm font-medium leading-6 text-gray-900"
+      >Username</label
+    >
+    <div>
+      <input
+        type="text"
+        name="username"
+        id="signup_username"
+        placeholder="Username"
+        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+      />
+      <span
+        id="usernameError"
+        class="hidden w-full rounded-md py-0.5 text-red-700 sm:text-sm sm:leading-6"
+      ></span>
+    </div>
+  </div>
+
+  <div>
+    <label
+      for="signup_password"
+      class="block text-sm font-medium leading-6 text-gray-900"
+      >Password</label
+    >
+    <div>
+      <input
+        type="password"
+        name="password"
+        id="signup_password"
+        placeholder="Password"
+        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+      />
+      <span
+        id="passwordError"
+        class="hidden w-full rounded-md py-0.5 text-red-700 sm:text-sm sm:leading-6"
+      ></span>
+    </div>
+  </div>
+
+  <div>
+    <label
+      for="signup_password_recheck"
+      class="block text-sm font-medium leading-6 text-gray-900"
+      >Re-enter Password</label
+    >
+    <div>
+      <input
+        type="password"
+        name="password"
+        id="signup_password_recheck"
+        placeholder="Re-enter Password"
+        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+      />
+      <span
+        id="passwordRecheckError"
+        class="hidden w-full rounded-md py-0.5 text-red-700 sm:text-sm sm:leading-6"
+      ></span>
+    </div>
+  </div>
+
+  <button
+    type="submit"
+    c
+    class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+  >
+    Sign Up
+  </button>
 </form>
+<div class="my-6 flex items-center">
+  <div class="flex-grow border-t border-gray-300"></div>
+  <span class="mx-2 text-gray-500">OR</span>
+  <div class="flex-grow border-t border-gray-300"></div>
+</div>
+
+<a id="GoogleLoginLink" class="items-center justify-center align-middle">
+  <img src="assets/CTA/SignUpGoogle.png" class="mx-auto w-2/3 rounded-lg" />
+</a>

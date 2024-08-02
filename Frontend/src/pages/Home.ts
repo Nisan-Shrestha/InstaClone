@@ -1,32 +1,58 @@
-// import { fetchView } from "../utils/utils";
+import { Post } from "../component/Post";
+import { IPost } from "../interfaces/Post.interface";
+import {
+  fetchView,
+  getCookie,
+  request,
+  updateNavbar,
+} from "../utils/utils";
 
-import { fetchView, request } from "../utils/utils";
-
-export class Home {
+export class HomeFeed {
   async load() {
     if (
       !window.history.state ||
       window.history.state.currentView != "homeView"
     ) {
-      let data = await fetchView("/views/Home.html");
-      document.getElementById("app")!.innerHTML = data;
+      let view = await fetchView("/views/Home.html");
+      document.getElementById("app")!.innerHTML = view;
       window.history.replaceState(
-        { ...window.history.state, currentView: "home" },
+        { ...window.history.state, currentView: "homeView" },
         "",
       );
     }
-    if (!localStorage.getItem("userInfo")) {
-      let userData = await request(
-        { url: import.meta.env.VITE_BACKEND_URL + "/user", method: "GET" },
-        false,
+    if (window.history.state.currentTab != "homeFeed") {
+      document.getElementById("mainContainer")!.innerHTML = "";
+      window.history.replaceState(
+        { ...window.history.state, currentTab: "homeFeed" },
+        "",
       );
-      console.log(userData);
-      // Code to execute if userInfo object is present in localstorage
     }
+    window.history.replaceState(
+      { ...window.history.state, currentTab: "homeFeed" },
+      "",
+    );
+    updateNavbar("home");
+
     this.setup();
   }
 
-  setup() {
+  async setup() {
+    // Post.createAndAppend(postData, document.getElementById("mainContainer")!);
+    let posts = (
+      await request({
+        url: import.meta.env.VITE_BACKEND_URL + "/posts/feed",
+        method: "GET",
+        header: {
+          "Content-Type": "application/json",
+        },
+      })
+    ).payload;
+    // console.log(posts[1]);
+    posts.forEach((post: Partial<IPost>) => {
+      console.log(post);
+      Post.createAndAppend(post, document.getElementById("mainContainer")!);
+    });
+    document.getElementById("homeIcon");
     console.log("setup about");
   }
 }

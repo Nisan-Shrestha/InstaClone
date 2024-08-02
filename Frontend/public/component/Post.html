@@ -1,0 +1,73 @@
+<!-- component -->
+<div class="w-full min-w-64 max-w-xl p-4">
+  <div class="w-full rounded-sm border border-neutral-300">
+    <a class="flex items-center px-4 py-3" data-link data-pfp-wrapper>
+      <img
+        data-pfp
+        get-parent-a
+        class="h-8 w-8 rounded-full"
+        src="/assets/icons/profile.svg"
+        sss
+      />
+      <div get-parent-a class="ml-3">
+        <span
+          data-username
+          get-parent-a
+          class="block text-sm font-semibold leading-tight antialiased"
+          >Username</span
+        >
+        <!-- <span data-username class="text-gray-600 text-xs block">Asheville, North Carolina</span> -->
+      </div>
+    </a>
+    <!--TODO add carousel here -->
+    <div data-carousel-holder class="aspect-square h-3/4 w-auto">
+      <img
+        data-post-media
+        class="h-auto w-full object-contain"
+        src=""
+      />
+    </div>
+    <!-- carousel end -->
+    <div class="mx-4 mb-2 mt-3 flex items-center justify-between">
+      <div class="flex gap-5">
+        <button data-like-button data-liked="false">
+          <img src="/assets/icons/like.svg" alt="" />
+        </button>
+        <button data-comment-button>
+          <img src="/assets/icons/comment.svg" alt="" />
+        </button>
+        <button data-share-button>
+          <img src="/assets/icons/share.svg" alt="" />
+        </button>
+      </div>
+      <div class="flex">
+        <button data-save-button data-saved="false">
+          <img src="/assets/icons/save.svg" alt="" />
+        </button>
+      </div>
+    </div>
+    <div class="mx-4 mb-4 mt-2 text-sm font-semibold">
+      <button><span data-like-count>92,372</span> likes</button>
+      <div class="py-2">
+        <a data-link data-pfp-wrapper>
+          <span
+            get-parent-a
+            data-username
+            class="text-sm font-semibold leading-tight antialiased"
+            >8fact</span
+          >
+        </a>
+        <p data-caption class="inline font-normal leading-snug">
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Et, ratione
+          dicta deleniti, quas distinctio, veniam quo rem eveniet aliquid
+          repudiandae fuga asperiores reiciendis tenetur? Eius quidem impedit et
+          soluta accusamus.
+        </p>
+      </div>
+      <button data-view-comment-button class="font-normal text-neutral-500">
+        View comments
+      </button>
+    </div>
+  </div>
+</div>
+<hr class="m-4 h-0.5 min-w-64 max-w-xl border-t-0 bg-neutral-200" />

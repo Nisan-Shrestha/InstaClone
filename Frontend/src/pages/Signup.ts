@@ -3,6 +3,7 @@ import { fetchView, request } from "../utils/utils";
 
 export class Signup {
   async load() {
+    console.log("Loadin from state: ", window.history.state.currentView);
     if (
       !window.history.state ||
       window.history.state.currentView != "loggedOut"
@@ -12,14 +13,15 @@ export class Signup {
       window.history.replaceState(
         { ...window.history.state, currentView: "loggedOut" },
         "",
+        null,
       );
     }
     let formHtml = await fetchView("/component/SignupForm.html");
-    console.log(formHtml);
+    // console.log(formHtml);
     document.getElementById("formHolder")!.innerHTML = formHtml;
 
     let formAltCTA = await fetchView("/component/AltLogin.html");
-    console.log(formAltCTA);
+    // console.log(formAltCTA);
     document.getElementById("formAltCTA")!.innerHTML = formAltCTA;
 
     document
@@ -75,7 +77,7 @@ export class Signup {
           encounteredError = true;
         }
         // encounteredError = true;
-        console.log(formData);
+        // console.log(formData);
         if (!encounteredError) {
           alert("No errors, submitting form");
           const response = await request(

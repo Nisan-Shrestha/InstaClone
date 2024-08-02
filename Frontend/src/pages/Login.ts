@@ -3,6 +3,7 @@ import { fetchView, request } from "../utils/utils";
 
 export class Login {
   async load() {
+    console.log("Loadin from state: ", window.history.state.currentView);
     if (
       !window.history.state ||
       window.history.state.currentView != "loggedOut"
@@ -12,6 +13,7 @@ export class Login {
       window.history.replaceState(
         { ...window.history.state, currentView: "loggedOut" },
         "",
+        null,
       );
     }
     let formHtml = await fetchView("/component/LoginForm.html");
@@ -66,6 +68,7 @@ export class Login {
           ).textContent = passwordError.message;
           error = true;
         }
+        localStorage.setItem("username", username);
 
         if (!error) {
           const response = await request(
@@ -79,6 +82,8 @@ export class Login {
             },
             true,
           );
+          if (response.status === "success") {
+          }
 
           if (response.status === "error") {
             // TODO: implement error toast

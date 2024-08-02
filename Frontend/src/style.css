@@ -2,3 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+img[data-nav-icon="home"].active {
+  src: url("assets/icons/home-active.svg");
+}
+
+.nav-link.active .nav-icon[nav-icon="profile"] {
+  content: url("profile-active.png");
+}
+
+.nav-link.active .nav-icon[nav-icon="settings"] {
+  content: url("settings-active.png");
+}
