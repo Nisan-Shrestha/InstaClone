@@ -28,7 +28,10 @@ export async function request(
   allowUnauthorized: boolean = false,
 ): Promise<{ status: string; message: string; payload: any }> {
   if (!allowUnauthorized) {
-    if (getCookie("refreshTokenValid") == "false") {
+    if (
+      getCookie("refreshTokenValid") == "false" ||
+      !getCookie("refreshTokenValid")
+    ) {
       router.navigate("/login");
       return {
         status: "redirected",
@@ -37,7 +40,10 @@ export async function request(
       };
     }
 
-    if (getCookie("accessTokenValid") == "false") {
+    if (
+      getCookie("accessTokenValid") == "false" ||
+      !getCookie("refreshTokenValid")
+    ) {
       await request(
         {
           url: import.meta.env.VITE_BACKEND_URL + "/auth/refresh",

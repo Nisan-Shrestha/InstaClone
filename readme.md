@@ -9,7 +9,7 @@
 - Run Backend and Database using docker compose script.
   ```bash
   cd InstaClone/Backend/
-  ./start-compose.sh
+  docker compose -f compose.yml -f compose-dev.yml watch 
   ```
 - In another terminal run migrations from inside the container
 
