@@ -15,7 +15,16 @@ import { BadRequest } from "../error/BadRequest";
 import { Internal } from "../error/Internal";
 const logger = loggerWithNameSpace("PostServices");
 
-export async function getPostByID(pid: UUID, uid: UUID | null) {
+interface PostExtras {
+  username: string;
+  pfpUrl: string;
+  mediaUrl: string[];
+  liked: boolean;
+  saved: boolean;
+  likeCount: number;
+}
+
+export async function getPostByID(pid: UUID, requesterId: UUID) {
   let post = await PostModel.PostModel.getPostByID(pid);
 
   if (!post) {
@@ -36,42 +45,31 @@ export async function getPostByID(pid: UUID, uid: UUID | null) {
       `User with id: ${post.userId} not found: Model Layer returned Null/undefined`
     );
   }
+  if (owner.id === requesterId) {
+    await FillPostData(post, requesterId);
+    return post;
+  }
   if (owner.privacy === Privacy.Public) {
-    let user = await UserModel.getUserInfoById(post.userId);
-    post.username = user.username;
-    post.pfpUrl = user.pfpUrl;
-    let mediaInfo = await PostModel.PostModel.getPostMedia(post.id);
-    post.mediaUrl = mediaInfo.map((item) => {
-      return item.mediaUrl;
-    });
+    await FillPostData(post, requesterId);
     return post;
   }
 
-  let isFollowing = await UserModel.getIfAFollowsB(uid!, owner.id);
+  let isFollowing = await UserModel.getIfAFollowsB(requesterId, owner.id);
   if (isFollowing) {
-    let user = await UserModel.getUserInfoById(post.userId);
-    post.username = user.username;
-    post.pfpUrl = user.pfpUrl;
-    let mediaInfo = await PostModel.PostModel.getPostMedia(post.id);
-    post.mediaUrl = mediaInfo.map((item) => {
-      return item.mediaUrl;
-    });
+    await FillPostData(post, requesterId);
     return post;
   } else throw new Unauthorized("Error: Unauthorized");
 }
 
-export async function getPublicPostsRandom(filter: IGetPostPagedQuery) {
+export async function getPublicPostsRandom(
+  filter: IGetPostPagedQuery,
+  requesterId: UUID
+) {
   let posts = await PostModel.PostModel.getPublicPostsRandom(filter);
   if (posts) {
     await Promise.all(
       posts.map(async (post) => {
-        let user = await UserModel.getUserInfoById(post.userId);
-        post.username = user.username;
-        post.pfpUrl = user.pfpUrl;
-        let mediaInfo = await PostModel.PostModel.getPostMedia(post.id);
-        post.mediaUrl = mediaInfo.map((item) => {
-          return item.mediaUrl;
-        });
+        await FillPostData(post, requesterId);
       })
     );
     return posts;
@@ -85,38 +83,16 @@ export async function getFilteredHashtags(filter: IGetHashtagFilter) {
   }
 }
 
-// export async function getFilteredHashtagPosts(filter: IGetPostByHastagFilter) {
-//   let posts = await PostModel.PostModel.getFilteredHashtagPosts(filter);
-//   if (posts) {
-//     await Promise.all(
-//       posts.map(async (post) => {
-//         let user = await UserModel.getUserInfoById(post.userId);
-//         post.username = user.username;
-//         post.pfpUrl = user.pfpUrl;
-//         let mediaInfo = await PostModel.PostModel.getPostMedia(post.id);
-//         post.mediaUrl = mediaInfo.map((item) => {
-//           return item.mediaUrl;
-//         });
-//       })
-//     );
-//     return posts;
-//   } else throw new NotFound("Error: Found no Posts");
-// }
-
-export async function getUserPostsPaged(uid: UUID, filter: IGetPostPagedQuery) {
-  let posts = await PostModel.PostModel.getUserPostsPaged(uid, filter);
-  let user = await UserModel.getUserInfoById(uid);
+export async function getUserPostsPaged(
+  requesterId: UUID,
+  filter: IGetPostPagedQuery
+) {
+  let posts = await PostModel.PostModel.getUserPostsPaged(requesterId, filter);
+  let user = await UserModel.getUserInfoById(requesterId);
   if (posts) {
     await Promise.all(
       posts.map(async (post) => {
-        post.username = user.username;
-        post.pfpUrl = user.pfpUrl;
-        let mediaInfo = await PostModel.PostModel.getPostMedia(post.id);
-        post.mediaUrl = mediaInfo.map((item) => {
-          return item.mediaUrl;
-        });
-        post.liked = await PostModel.PostModel.getIfUserLikedPost(uid, post.id);
-        post.saved = await PostModel.PostModel.getIfUserSavedPost(uid, post.id);
+        await FillPostData(post, requesterId);
       })
     );
     return posts;
@@ -136,25 +112,9 @@ export async function getFeedPosts(
   if (!postsList) throw new NotFound("Error: Found no Posts");
   await Promise.all(
     postsList.map(async (post) => {
-      let user = await UserModel.getUserInfoById(post.userId);
-      post.username = user.username;
-      post.pfpUrl = user.pfpUrl;
-      post.liked = await PostModel.PostModel.getIfUserLikedPost(
-        requester.id,
-        post.id
-      );
-      post.saved = await PostModel.PostModel.getIfUserSavedPost(
-        requester.id,
-        post.id
-      );
-
-      let mediaInfo = await PostModel.PostModel.getPostMedia(post.id);
-      post.mediaUrl = mediaInfo.map((item) => {
-        return item.mediaUrl;
-      });
+      await FillPostData(post, requester.id);
     })
   );
-  console.log(postsList);
   if (postsList) return postsList;
   else throw new NotFound("Error: Found no Posts");
 }
@@ -168,7 +128,6 @@ export async function handlePostUpload(
     throw new BadRequest("No photos found in the request");
   }
 
-  // TODO: handle error here
   let linkPromises: Promise<string>[] = photos.map(async (photo) => {
     let result = await uploadStream(photo.buffer, "post_media", photo.filename);
     return result.secure_url as string;
@@ -208,11 +167,31 @@ export async function handlePostUpload(
     return await PostModel.PostModel.addMediaUrl(createdPost.id, link, index);
   });
   mediaEntryIds = await Promise.all(mediaEntryIds);
-  // console.log(tags);
-  // Use the links array as needed
-  console.log(linkPromises);
 
   if (createdPost) return { createdPost, mediaEntryIds, hastagsIds };
+}
+
+async function FillPostData(
+  post: Partial<IPost & PostExtras>,
+  requesterId: UUID
+) {
+  let user = await UserModel.getUserInfoById(post.userId);
+  post.username = user.username;
+  post.pfpUrl = user.pfpUrl;
+  let mediaInfo = await PostModel.PostModel.getPostMedia(post.id);
+  post.mediaUrl = mediaInfo.map((item) => {
+    return item.mediaUrl;
+  });
+  post.liked = await PostModel.PostModel.getIfUserLikedPost(
+    requesterId,
+    post.id
+  );
+  post.saved = await PostModel.PostModel.getIfUserSavedPost(
+    requesterId,
+    post.id
+  );
+  post.likeCount = await PostModel.PostModel.getLikeCount(post.id);
+  return post;
 }
 
 export async function updatePostCaption(pid: UUID, uid: UUID, caption: string) {

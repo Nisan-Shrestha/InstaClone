@@ -14,7 +14,7 @@ const logger = loggerWithNameSpace("ApiControllers");
 export async function follow(req: Request, res: Response, next: NextFunction) {
   logger.info("Attempted follow: ");
   const requesterID = req.user.id;
-  const requestedUsername = req.params.username;
+  const requestedUsername = req.params.username.toLowerCase();
   const serviceResponse = await UserService.follow(
     requesterID,
     requestedUsername
@@ -37,7 +37,7 @@ export async function unfollow(
 ) {
   logger.info("Attempted unfollow: ");
   const requesterID = req.user.id;
-  const requestedUsername = req.params.username;
+  const requestedUsername = req.params.username.toLowerCase();
   const serviceResponse = await UserService.unfollow(
     requesterID,
     requestedUsername
@@ -63,7 +63,33 @@ export async function getFollowRequests(
   const requesterID = req.user.id;
   const serviceResponse = await UserService.getFollowRequests(requesterID);
   if (serviceResponse) {
-    logger.info("Returning follow requests list");
+    logger.info("Returning follow requests list,");
+    res.status(HttpStatusCodes.OK).json({
+      message: "Fetched Follow Requests",
+      payload: serviceResponse,
+    });
+    return;
+  }
+  logger.error("Some Error Occurred");
+  throw new Internal("Some Error Occurred");
+}
+
+export async function manageFollowReq(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const followRequestedId = req.user.id; // cuz this
+  const followRequesterUsername = req.params.username.toLowerCase();
+  const decision = req.query.decision as string;
+  console.log(followRequestedId, followRequesterUsername);
+  const serviceResponse = await UserService.manageFollowReq(
+    followRequesterUsername,
+    followRequestedId,
+    decision
+  );
+  if (serviceResponse) {
+    logger.info("Returning follow requests list,");
     res.status(HttpStatusCodes.OK).json({
       message: "Fetched Follow Requests",
       payload: serviceResponse,

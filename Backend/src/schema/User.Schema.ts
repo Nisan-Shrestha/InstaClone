@@ -1,9 +1,10 @@
 import Joi from "joi";
 
 export const UsernameSchema = Joi.object({
-  username: Joi.string().required().messages({
-    "string.base": "username must be a string okay!",
-    "any.required": "username is required",
+  username: Joi.string().required().lowercase().messages({
+    "string.base": "Username must be a string okay!",
+    "any.required": "Username is required",
+    "string.lowercase": "Username must be in lowercase",
   }),
 }).options({ stripUnknown: true });
 
@@ -26,20 +27,75 @@ export const getAllUsersSchema = Joi.object({
 }).options({ stripUnknown: true });
 
 export const updateLoggedInUserInfoSchema = Joi.object({
-  name: Joi.string().optional().messages({
-    "string.base": "Name must be a string",
-  }),
-  privacy: Joi.string().valid("public", "private").optional().messages({
+  username: Joi.string()
+    .regex(/^[a-zA-Z0-9.]+$/)
+    .required()
+    .min(3)
+    .lowercase()
+    .messages({
+      "string.lowercase": "Username must be in lowercase",
+      "any.required": "Username is required",
+      "string.pattern.base":
+        "Username can only contain alphabets, numbers, and periods",
+    }),
+  name: Joi.string()
+    .required()
+    .pattern(/^[a-zA-Z0-Z0-9 ]+$/)
+    .min(4)
+    .messages({
+      "string.empty": "Username is required",
+      "string.min": "Username must be at least 4 characters",
+      "string.pattern.base":
+        "Username must only containric characters and spaces ' '.",
+    }),
+  privacy: Joi.string().valid("Public", "Private").optional().messages({
     "string.base": "Privacy must be a string",
-    "any.only": "Privacy must be either 'public' or 'private'",
+    "any.only": "Privacy must be either 'Public' or 'Private'",
   }),
-  bio: Joi.string().allow(null).optional().messages({
+  bio: Joi.string().optional().allow("").messages({
     "string.base": "Bio must be a string",
   }),
-  phone: Joi.string().allow(null).optional().messages({
+  phone: Joi.string().optional().allow("").messages({
     "string.base": "Phone must be a string",
   }),
 }).options({ stripUnknown: true });
+
+export const resetViaEmailSchema = Joi.object({
+  token: Joi.string().required().messages({
+    "any.required": "Token is required",
+  }),
+  password: Joi.string()
+    .required()
+    .min(8)
+    .messages({
+      "any.required": "Password is required",
+      "string.min": "Password must be at least 8 characters",
+      "password.uppercase":
+        "Password must contain at least one uppercase letter",
+      "password.lowercase":
+        "Password must contain at least one lowercase letter",
+      "password.special": "Password must contain at least one special letter",
+      "password.number": "Password must contain at least one number ",
+    })
+    .custom((value, helpers) => {
+      if (!/[A-Z]/.test(value)) {
+        return helpers.error("password.uppercase");
+      }
+      if (!/[a-z]/.test(value)) {
+        return helpers.error("password.lowercase");
+      }
+      if (!/[0-9]/.test(value)) {
+        return helpers.error("password.number");
+      }
+      if (!/[!@#$%^&*]/.test(value)) {
+        return helpers.error("password.special");
+      }
+
+      return value;
+    }),
+}).options({
+  stripUnknown: true,
+});
 
 export const updateLoggedInUserPasswordSchema = Joi.object({
   OldPassword: Joi.string().required().messages({

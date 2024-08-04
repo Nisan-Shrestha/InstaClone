@@ -2,7 +2,7 @@ import { UUID } from "crypto";
 
 export interface IPost {
   id: UUID;
-  userID: UUID;
+  userId: UUID;
   caption: string;
   createdAt: Date;
 }

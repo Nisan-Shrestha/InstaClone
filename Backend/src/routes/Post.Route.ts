@@ -31,6 +31,7 @@ const router = express();
 
 router.get(
   "/explore",
+  authenticate,
   validateReqQuery(getTagPostListSchema),
   requestHandler([getPublicPostsRandom])
 );
@@ -51,6 +52,7 @@ router.get(
 
 router.get(
   "/:id",
+  authenticate,
   validateReqParams(getPostSchema),
   requestHandler([getPostByID])
 );

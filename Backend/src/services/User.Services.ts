@@ -12,19 +12,25 @@ import * as UserModel from "../models/User.Model";
 import loggerWithNameSpace from "../utils/logger";
 // import { UserModel } from "../models/User";
 // import { generateUsername } from "unique-username-generator";
-import { generateUsername } from "unique-username-generator";
-import { alternatives } from "joi";
 import bcryptjs from "bcryptjs";
-import { Unauthorized } from "../error/Unauthorized";
+import { verify } from "jsonwebtoken";
+import { generateUsername } from "unique-username-generator";
 import { BadRequest } from "../error/BadRequest";
+import { Unauthorized } from "../error/Unauthorized";
 import { IGetUserPagedQuery } from "../interfaces/Utils.Interface";
 import * as PostModel from "../models/Post.Model";
+import { uploadStream } from "../utils/cloudinary";
 
 const logger = loggerWithNameSpace("UserServices");
 
 interface IUserWithPrompt extends IUser {
   promptUsername?: boolean;
 }
+
+interface IUserMeta extends IUser {
+  following?: FollowStatus;
+}
+
 export async function getLoggedInUserInfo(id: UUID) {
   logger.info(`Getting user info for id: ${id}`);
   let data = (await UserModel.UserModel.getUserInfoById(id)) as IUserWithPrompt;
@@ -64,7 +70,7 @@ export async function getFreeUsernames(username: string, count: number) {
     }
   }
   while (alternatives.length < count) {
-    let name = generateUsername("", 3, username.length + 8, username);
+    let name = generateUsername(".", 8, username.length + 8, username);
     const exists = await UserModel.UserModel.getUserByUsername(name);
     if (!exists) {
       alternatives.push(name);
@@ -157,7 +163,16 @@ export async function updateLoggedInUserInfo(
   updateData: Partial<IUser>
 ) {
   logger.info(`Updating user with id: ${id}`);
+  let usernameStatus;
+  const user = await UserModel.UserModel.getUserInfoById(id);
+  if (user.username == updateData.username) {
+    usernameStatus = { isFree: true };
+  } else usernameStatus = await checkFreeUsername(updateData.username);
 
+  if (!usernameStatus.isFree) {
+    logger.error(`Username ${updateData.username!} is already taken`);
+    throw new BadRequest(`Username ${updateData.username!} is already taken`);
+  }
   const updatedUser = await UserModel.UserModel.updateLoggedInUserInfo(
     id,
     updateData
@@ -170,6 +185,20 @@ export async function updateLoggedInUserInfo(
   return updatedUser;
 }
 
+export async function updateProfilePic(
+  photo: Express.Multer.File,
+  userId: UUID
+) {
+  if (!photo) {
+    throw new BadRequest("No photos found in the request");
+  }
+
+  let result = await uploadStream(photo.buffer, "post_media", photo.filename);
+  if (!result) {
+    throw new Internal("Could not upload photo");
+  }
+  return await setUserPicture(userId, result.secure_url);
+}
 export async function updateLoggedInUserPassword(
   id: UUID,
   updateData: { OldPassword: string; NewPassword: string }
@@ -185,7 +214,7 @@ export async function updateLoggedInUserPassword(
     throw new Unauthorized("Invalid old password received");
   }
   const hashedPassword = await hash(updateData.NewPassword, 10);
-  const updatedUser = await UserModel.UserModel.updateLoggedInUserPassword(
+  const updatedUser = await UserModel.UserModel.updateUserPW(
     id,
     hashedPassword
   );
@@ -193,7 +222,37 @@ export async function updateLoggedInUserPassword(
     logger.error(`User with id: ${id} not found`);
     throw new NotFound(`User with id: ${id} not found`);
   }
-  logger.info(`User updated: ${JSON.stringify(updatedUser)}`);
+  logger.info(`User pws updated: ${JSON.stringify(updatedUser)}`);
+  return updatedUser;
+}
+
+export async function updatePWviaEmail(token: string, pw: string) {
+  // decode token as jwt and get id param from it
+  let userId;
+  token = token.split("=")[1];
+  console.log(token)
+  try {
+    const decodedToken = verify(token, process.env.JWT_SECRET) as {
+      id: UUID;
+    };
+    userId = decodedToken.id;
+    // Rest of the code
+  } catch (error) {
+    throw new Unauthorized("Invalid token");
+  }
+
+  const user = await UserModel.UserModel.getUserInfoById(userId);
+  if (!user) {
+    throw new NotFound("User with token not found");
+  }
+  const hashedPassword = await hash(pw, 10);
+  const updatedUser = await UserModel.UserModel.updateUserPW(
+    user.id,
+    hashedPassword
+  );
+  if (!updatedUser) {
+    throw new Internal("Could not update password");
+  }
   return updatedUser;
 }
 
@@ -201,8 +260,10 @@ export async function updateLoggedInUserUsername(
   id: UUID,
   newUsername: string
 ) {
+  newUsername = newUsername.toLowerCase();
   logger.info(`Attempt Update username id: ${id}`);
   let existingUser = (await UserModel.UserModel.getUserInfoById(id)) as IUser;
+  if (existingUser.id != id) throw new Unauthorized("Unauthorised task");
   let isFree = await checkFreeUsername(newUsername).then((res) => res.isFree);
   let updatedUser;
   if (isFree)
@@ -210,6 +271,7 @@ export async function updateLoggedInUserUsername(
       id,
       newUsername
     );
+  else throw new BadRequest("Username already taken");
   if (!updatedUser) {
     logger.error(`User with id: ${id} not found`);
     throw new NotFound(`User with id: ${id} not found`);
@@ -226,18 +288,6 @@ export async function deleteUser(id: UUID) {
   return result;
 }
 
-export async function getUserInfoById(id: UUID) {
-  logger.info(`Getting user by ID: ${id}`);
-  const data = await UserModel.UserModel.getUserInfoById(id);
-  if (data) {
-    logger.info(`User found: ${JSON.stringify(data)}`);
-    return data;
-  }
-
-  logger.warn(`User with ID ${id} not found`);
-  return null;
-  // throw new Error(`User with email ${email} not found`);
-}
 export async function getUserByEmail(email: string) {
   logger.info(`Getting user by email: ${email}`);
   const data = await UserModel.UserModel.getUserByEmail(email);
@@ -251,15 +301,35 @@ export async function getUserByEmail(email: string) {
   // throw new Error(`User with email ${email} not found`);
 }
 
-export async function getUserByUsername(username: string) {
-  logger.info(`Getting user by email: ${username}`);
-  const data = await UserModel.UserModel.getUserByUsername(username);
+export async function getUserByUsername(username: string, requesterId?: UUID) {
+  logger.info(`Getting user by username: ${username}`);
+  const data: IUserMeta = await UserModel.UserModel.getUserByUsername(username);
   if (data) {
-    console.log("omitted data: ", data);
+    data.followerCount = (
+      await UserModel.UserModel.getUserFollowersList(data.id)
+    ).length;
+    data.followingCount = (
+      await UserModel.UserModel.getUserFollowingList(data.id)
+    ).length;
+    data.postCount = await PostModel.PostModel.getUserPostCount(data.id);
+    if (requesterId) {
+      let followStatus = await UserModel.UserModel.getIfAFollowsB(
+        requesterId,
+        data.id
+      );
+      let followReqStatus = await UserModel.UserModel.getIfARequestedFollowsB(
+        requesterId,
+        data.id
+      );
+      if (followStatus) data.following = FollowStatus.Following;
+      else if (followReqStatus) data.following = FollowStatus.Pending;
+      else data.following = FollowStatus.Notfollowing;
+    }
+
     return data;
   }
 
-  logger.warn(`User with email ${username} not found`);
+  logger.warn(`User with username ${username} not found`);
   return null;
   // throw new Error(`User with email ${email} not found`);
 }
@@ -319,16 +389,16 @@ export async function getUserFollowersList(
 }
 
 export async function getUserPosts(
-  requesterUsername: string | null,
-  requestedUsername: string,
-  isPublicReq: boolean
+  requesterUsername: string,
+  requestedUsername: string
 ) {
   let requesterFollows = false;
   let requester = null;
   const requested = await UserModel.UserModel.getUserByUsername(
     requestedUsername
   );
-  if (!isPublicReq) {
+  let isSelfReq = requesterUsername == requestedUsername;
+  if (!isSelfReq) {
     requester = await UserModel.UserModel.getUserByUsername(requesterUsername);
     if (!requester) {
       throw new Unauthorized(`Requester User ${requesterUsername} not found`);
@@ -340,7 +410,7 @@ export async function getUserPosts(
   }
 
   if (
-    isPublicReq ||
+    isSelfReq ||
     requested.privacy == Privacy.Public ||
     requester.role == Roles.Admin ||
     requesterFollows
@@ -484,6 +554,32 @@ export async function getFollowRequests(id: UUID) {
     throw new NotFound(`User with id: ${id} not found`);
   }
   return data;
+}
+
+export async function manageFollowReq(
+  requesterUsername: string,
+  requestedId: UUID,
+  decision: string
+) {
+  console.log(`Manage follow request: ${decision}`);
+  const requester = await UserModel.UserModel.getUserByUsername(
+    requesterUsername
+  );
+  console.log(requester.id, requestedId);
+  console.log(requester.id, requestedId);
+  if (!requester) {
+    throw new NotFound(`User with username: ${requesterUsername} not found`);
+  }
+  if (decision == "Accepted") {
+    console.log(requester.id, requestedId);
+    await UserModel.UserModel.createFollow(requester.id, requestedId);
+    await UserModel.UserModel.deleteFollowRequest(requester.id, requestedId);
+    return { followResult: "followed" };
+  } else if (decision == "Rejected") {
+    await UserModel.UserModel.deleteFollowRequest(requester.id, requestedId);
+    return { followResult: "rejected" };
+  }
+  throw new Internal(`Something went wrong`);
 }
 
 export async function likePost(requesterId: UUID, pid: UUID) {

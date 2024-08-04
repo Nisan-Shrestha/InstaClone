@@ -24,7 +24,7 @@ export async function up(knex: Knex): Promise<void> {
       .inTable("posts")
       .onDelete("CASCADE");
     table.integer("order");
-    table.string("media_url").notNullable();
+    table.text("media_url").notNullable();
   });
 }
 

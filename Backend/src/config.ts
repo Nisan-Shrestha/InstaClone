@@ -7,7 +7,7 @@ const config = {
   port: process.env.PORT || 8000,
   jwt: {
     secret: process.env.JWT_SECRET,
-    accessTokenExpiryMS: 1000000 ,
+    accessTokenExpiryMS: 1000000,
     refreshTokenExpiryMS: 21600000,
   },
   database: {
@@ -18,10 +18,14 @@ const config = {
     password: process.env.DB_PASSWORD,
     name: process.env.DB_NAME,
   },
-  google: {
+  G_OAuth: {
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     redirectUri: process.env.GOOGLE_REDIRECT_URI,
+  },
+  mailer: {
+    email: process.env.NODE_MAILER_EMAIL,
+    password: process.env.NODE_MAILER_PASSWORD,
   },
   frontendUrl: process.env.FRONTEND_URL,
 };

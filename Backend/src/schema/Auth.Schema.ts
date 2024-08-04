@@ -1,10 +1,11 @@
 import Joi from "joi";
 
 export const loginSchema = Joi.object({
-  username: Joi.string().required().messages({
+  username: Joi.string().required().lowercase().messages({
     "any.required": "Username is required",
     "string.base": "Username was not a string",
     "string.empty": "Empty Username not allowed",
+    "string.lowercase": "Username must be in lowercase",
   }),
   password: Joi.string().required().messages({
     "any.required": "Password is required",
@@ -28,7 +29,10 @@ export const signupSchema = Joi.object({
     .regex(/^[a-zA-Z0-9.]+$/)
     .required()
     .min(3)
+    .lowercase()
     .messages({
+      "string.lowercase": "Username must be in lowercase",
+
       "any.required": "Username is required",
       "string.pattern.base":
         "Username can only contain alphabets, numbers, and periods",

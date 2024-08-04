@@ -1,23 +1,22 @@
 import express from "express";
-import config from "../config";
-import { sign } from "jsonwebtoken";
-import { authenticate } from "../middleware/authController";
 import {
   follow,
   getFilteredHashtags,
   // getFilteredHashtagPosts,
   getFollowRequests,
   likePost,
+  manageFollowReq,
   savePost,
   unfollow,
   unlikePost,
   unsavePost,
 } from "../controller/Api.Controller";
-import { requestHandler } from "../utils/reqHandler";
+import { authenticate } from "../middleware/authController";
 import { validateReqParams, validateReqQuery } from "../middleware/validator";
-import { UsernameSchema } from "../schema/User.Schema";
 import { decisionSchema, getHastagsSchema } from "../schema/Api.Schema";
 import { getPostSchema } from "../schema/Post.Schema";
+import { UsernameSchema } from "../schema/User.Schema";
+import { requestHandler } from "../utils/reqHandler";
 
 const router = express();
 
@@ -34,7 +33,7 @@ router.delete(
   requestHandler([unfollow])
 );
 router.get(
-  "/follow-requests/",
+  "/follow-requests",
   authenticate,
   requestHandler([getFollowRequests])
 );
@@ -43,7 +42,7 @@ router.put(
   authenticate,
   validateReqParams(UsernameSchema),
   validateReqQuery(decisionSchema),
-  requestHandler([getFollowRequests])
+  requestHandler([manageFollowReq])
 );
 
 router.post(

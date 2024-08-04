@@ -16,27 +16,6 @@
               Edit Profile
             </button>
           </span>
-          <!-- <span class="text-base font-semibold text-gray-700">
-            <button
-              class="rounded-full border-transparent p-1 text-gray-700 hover:text-blue-600 focus:text-gray-600 focus:outline-none"
-              aria-label="Notifications"
-            >
-              <svg
-                class="h-8 w-8"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.5"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                />
-                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </button>
-          </span> -->
         </div>
 
         <div class="pl-4 pt-3 text-left">
@@ -60,19 +39,23 @@
 
         <div class="pl-4 pt-3 text-left">
           <p data-bio class="mr-2 text-base font-medium">The Bio Goes Here</p>
-          <!-- <p class="mr-2 text-base font-medium text-gray-700">
-            https://www.behance.net/hiravesona7855
-          </p> -->
         </div>
       </div>
 
-      <div class="p-4 text-center md:w-1/4">
-        <img
-          data-pfp
-          class="h-40 w-40 rounded-full object-cover shadow-[rgba(0,_0,_0,_0.25)_0px_25px_50px_-12px]"
-          src="/assets/icons/profile.svg"
-          alt
-        />
+      <div class="relative p-4 text-center md:w-1/4">
+        <div class="relative">
+          <div
+            class="absolute inset-0 flex h-40 w-40 items-center justify-center rounded-full bg-black bg-opacity-50 text-white opacity-0 transition-opacity hover:opacity-100"
+          >
+            Change
+          </div>
+          <img
+            data-pfp
+            class="h-40 w-40 rounded-full object-cover shadow-[rgba(0,_0,_0,_0.25)_0px_25px_50px_-12px]"
+            src="/assets/icons/profile.svg"
+            alt
+          />
+        </div>
       </div>
     </div>
 

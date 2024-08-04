@@ -9,10 +9,9 @@ import { IUser } from "../interfaces/User.Interface";
 import * as AuthService from "../services/Auth.Services";
 
 import HttpStatusCodes from "http-status-codes";
+import nodemailer from "nodemailer";
 import loggerWithNameSpace from "../utils/logger";
 import { Internal } from "../error/Internal";
-import { getUserByEmail } from "../services/User.Services";
-import { NotFound } from "../error/NotFound";
 
 interface LoginInfo extends Pick<IUser, "username" | "password"> {}
 
@@ -41,6 +40,18 @@ export async function login(
 
   logger.error("Login Failed:");
   throw new Unauthorized("Login Failed");
+}
+
+export async function logout(
+  req: Request<any, any, LoginInfo>,
+  res: Response,
+  next: NextFunction
+) {
+  logger.info("Attempted logout ");
+
+  cookieReset(res);
+  res.redirect(`${config.frontendUrl}/login`);
+  return;
 }
 
 export async function signup(req: Request, res: Response, next: NextFunction) {
@@ -93,7 +104,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
       const payload = {
         id: data.id,
         name: data.name,
-        username: data.username,
+        username: data.username.toLowerCase(),
         email: data.email,
         role: data.role,
         pfpUrl: data.pfpUrl,
@@ -106,6 +117,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
         refreshToken,
         username: data.username,
         pfpUrl: data.pfpUrl,
+        promptUsernameChange: data.id == data.username,
       })
         .status(HttpStatusCodes.ACCEPTED)
         .json({
@@ -122,7 +134,7 @@ export async function googleLogin(
   next: NextFunction
 ) {
   const params = querystring.stringify({
-    client_id: config.google.clientId,
+    client_id: config.G_OAuth.clientId,
     redirect_uri: "http://localhost:8000/auth/login/google/callback",
     response_type: "code",
     scope:
@@ -141,6 +153,12 @@ export async function googleLoginCallback(
   let serviceResponse = await AuthService.loginWithGoogle(code);
 
   if (serviceResponse) {
+    if (serviceResponse instanceof Error) {
+      res
+        .status(HttpStatusCodes.SEE_OTHER)
+        .redirect(`${config.frontendUrl}/login`);
+      return;
+    }
     logger.info("Login Successfull");
 
     cookieSetter(res, serviceResponse)
@@ -160,7 +178,7 @@ export async function googleSignUp(
   next: NextFunction
 ) {
   const params = querystring.stringify({
-    client_id: config.google.clientId,
+    client_id: config.G_OAuth.clientId,
     redirect_uri: "http://localhost:8000/auth/signup/google/callback",
     response_type: "code",
     scope:
@@ -202,6 +220,7 @@ function cookieSetter(
     refreshToken: string;
     username: string;
     pfpUrl: string;
+    promptUsernameChange: boolean;
   }
 ) {
   console.log(serviceResponse.pfpUrl);
@@ -215,9 +234,10 @@ function cookieSetter(
       httpOnly: false,
       maxAge: config.jwt.accessTokenExpiryMS,
     })
-    .cookie("username", serviceResponse.username, {
+    .cookie("username", serviceResponse.username.toLowerCase(), {
       httpOnly: false,
     })
+    .cookie("promptUsernameChange", serviceResponse.promptUsernameChange, {})
     .cookie("pfpUrl", serviceResponse.pfpUrl || "empty", {
       httpOnly: false,
     })
@@ -230,4 +250,69 @@ function cookieSetter(
       httpOnly: false,
       maxAge: config.jwt.refreshTokenExpiryMS,
     });
+}
+
+function cookieReset(res: Response) {
+  return res
+    .cookie("accessToken", undefined, {
+      httpOnly: true,
+      sameSite: "strict",
+    })
+    .cookie("accessTokenValid", false, {
+      httpOnly: false,
+    })
+    .cookie("username", undefined, {
+      httpOnly: false,
+    })
+    .cookie("promptUsernameChange", false, {})
+
+    .cookie("pfpUrl", undefined, {
+      httpOnly: false,
+    })
+    .cookie("refreshToken", undefined, {
+      httpOnly: true,
+      sameSite: "strict",
+    })
+    .cookie("refreshTokenValid", false, {
+      httpOnly: false,
+    });
+}
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    // user: config.mailer.email,
+    // pass: config.mailer.password,
+    user: "instabackendclone@gmail.com",
+    pass: "wwqp ygts cvsf otmo",
+  },
+});
+
+export async function sendMail(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  let requesterEmail = req.body.email;
+
+  let link = await AuthService.resetLinkGenerate(requesterEmail);
+  if (!link) throw new Error("Link not generated");
+  try {
+    await transporter.sendMail({
+      to: requesterEmail,
+      subject:
+        "Change PW requested for account associated with email: " +
+        requesterEmail,
+      html: `<b>Click on this link to reset your Pw</b>
+      <a href="${link}">Reset Link</a>`,
+    });
+  } catch (e) {
+    throw new Internal("Error sending mail");
+  }
+  cookieReset(res);
+  res
+    .status(HttpStatusCodes.ACCEPTED)
+    .json({ message: "Mail sent to:" + requesterEmail });
 }

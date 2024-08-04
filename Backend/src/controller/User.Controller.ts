@@ -10,6 +10,7 @@ import loggerWithNameSpace from "../utils/logger";
 import { verify } from "jsonwebtoken";
 import config from "../config";
 import { IGetUserPagedQuery } from "../interfaces/Utils.Interface";
+import { IUser } from "../interfaces/User.Interface";
 const logger = loggerWithNameSpace("UserController");
 
 export async function getLoggedInUserInfo(
@@ -36,18 +37,25 @@ export async function getUserByUsername(
   next: NextFunction
 ) {
   const { username } = req.params;
+  const user = req.user;
   logger.info("Called getUserByUsername");
 
   const serviceResponse = await UserService.getUserByUsername(
-    username as string
+    username as string,
+    user.id
   );
   if (!serviceResponse) {
     logger.error("User not found in getUserInfo");
     throw new NotFound("Could not find user with given id");
   }
-  res
-    .status(HttpStatusCodes.ACCEPTED)
-    .json({ message: "User Found", payload: serviceResponse });
+  const filteredRes = {
+    ...serviceResponse,
+    password: undefined,
+  };
+  res.status(HttpStatusCodes.ACCEPTED).json({
+    message: "User Found",
+    payload: filteredRes,
+  });
 }
 
 export async function getAllFilteredUser(
@@ -111,9 +119,35 @@ export async function updateLoggedInUserInfo(
   if (serviceResponse) {
     res
       .status(HttpStatusCodes.ACCEPTED)
+      .cookie("username", serviceResponse.username, {
+        httpOnly: false,
+      })
       .json({ message: "User Updated", payload: serviceResponse });
+    return;
   }
 
+  throw Error("Could not update User");
+}
+
+export async function updateProfilePic(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const imageFiles = req.files as { [key: string]: Express.Multer.File[] };
+  console.log("req body", JSON.stringify(req.body));
+  let photo: Express.Multer.File = imageFiles.photo[0];
+
+  const { id } = req.user;
+  const { body } = req;
+  logger.info("Called updateProfilePic");
+
+  const serviceResponse = await UserService.updateProfilePic(photo, id as UUID);
+  if (serviceResponse) {
+    res
+      .status(HttpStatusCodes.ACCEPTED)
+      .json({ message: "User Updated", payload: serviceResponse });
+  }
   throw Error("Could not update User");
 }
 
@@ -139,6 +173,24 @@ export async function updateLoggedInUserPassword(
   throw Error("Could not update User");
 }
 
+export async function updatePWViaEmail(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const token = req.body.token;
+  const pw = req.body.password;
+  console.log(token);
+  const serviceResponse = await UserService.updatePWviaEmail(token, pw);
+  if (serviceResponse) {
+    res
+      .status(HttpStatusCodes.ACCEPTED)
+      .json({ message: "User Updated", payload: serviceResponse });
+  }
+
+  throw Error("Could not update User");
+}
+
 export async function updateLoggedInUserUsername(
   req: Request,
   res: Response,
@@ -155,6 +207,10 @@ export async function updateLoggedInUserUsername(
   if (serviceResponse) {
     res
       .status(HttpStatusCodes.ACCEPTED)
+      .cookie("username", serviceResponse.username, {
+        httpOnly: false,
+      })
+      .cookie("promptUsernameChange", false, { httpOnly: false })
       .json({ message: "User Updated", payload: serviceResponse });
   }
 
@@ -246,25 +302,11 @@ export async function getUserPosts(
   res: Response,
   next: NextFunction
 ) {
-  let requesterUsername = null;
-  let isPublicReq = false;
-  const accessToken = req.cookies.accessToken;
-  let userData;
-  if (accessToken) {
-    verify(accessToken, config.jwt.secret!, async (error, data) => {
-      userData = data;
-    });
-    let requester = await UserService.getUserInfoById(userData.id);
-    requesterUsername = requester.username;
-  } else {
-    isPublicReq = true;
-  }
   let requestedUsername = req.params.username;
-
+  let requesterUsername = req.user.username;
   const serviceResponse = await UserService.getUserPosts(
     requesterUsername,
-    requestedUsername,
-    isPublicReq
+    requestedUsername
   );
   if (!serviceResponse) {
     logger.error("Some Error Occurred");
@@ -272,7 +314,7 @@ export async function getUserPosts(
   }
   res
     .status(HttpStatusCodes.ACCEPTED)
-    .json({ message: "User Found", payload: serviceResponse });
+    .json({ message: "Posts FOund", payload: serviceResponse });
 }
 
 export async function getUserLikedPosts(

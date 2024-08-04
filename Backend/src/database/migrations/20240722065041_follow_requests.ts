@@ -33,6 +33,7 @@ export async function up(knex: Knex): Promise<void> {
       .enu("status", ["Pending", "Accepted", "Rejected"])
       .defaultTo("Pending");
     table.timestamp("created_at").defaultTo(knex.fn.now());
+    table.unique(["requested_id", "requester_id"]); // Add unique constraint
   });
 }
 

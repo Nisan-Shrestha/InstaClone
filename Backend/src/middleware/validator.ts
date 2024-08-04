@@ -20,6 +20,7 @@ export function validateReqBody(schema: Schema) {
     const { error, value } = schema.validate(req.body);
 
     if (error) {
+      console.log(req.body);
       next(new BadRequest(error.message));
     }
     req.body = value;

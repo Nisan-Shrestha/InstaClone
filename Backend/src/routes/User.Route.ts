@@ -1,34 +1,34 @@
-import { Schema } from "joi";
 import express from "express";
 
 import {
-  getLoggedInUserInfo,
-  createUser,
   deleteSelf,
   getAllFilteredUser,
+  getLoggedInUserInfo,
   getUserByUsername,
+  getUserFollowersList,
+  getUserFollowingList,
+  getUserLikedPosts,
+  getUserPosts,
+  getUserSavedPosts,
   updateLoggedInUserInfo,
   updateLoggedInUserPassword,
   updateLoggedInUserUsername,
-  getUserFollowingList,
-  getUserFollowersList,
-  getUserPosts,
-  getUserLikedPosts,
-  getUserSavedPosts,
+  updateProfilePic,
+  updatePWViaEmail,
 } from "../controller/User.Controller";
 import { authenticate } from "../middleware/authController";
+import multerUploader from "../middleware/multerHandler";
 import {
   validateReqBody,
   validateReqParams,
   validateReqQuery,
 } from "../middleware/validator";
 import {
-  createUserSchema,
-  UsernameSchema,
-  updateUserByIDBodySchema,
-  updateLoggedInUserInfoSchema,
   getAllUsersSchema,
+  resetViaEmailSchema,
+  updateLoggedInUserInfoSchema,
   updateLoggedInUserPasswordSchema,
+  UsernameSchema,
 } from "../schema/User.Schema";
 import { requestHandler } from "../utils/reqHandler";
 
@@ -59,6 +59,7 @@ router.get(
 
 router.get(
   "/:username/posts",
+  authenticate,
   validateReqParams(UsernameSchema),
   // validateReqBody(UsernameSchema),
   requestHandler([getUserPosts])
@@ -66,6 +67,7 @@ router.get(
 
 router.get(
   "/:username",
+  authenticate,
   validateReqParams(UsernameSchema),
   requestHandler([getUserByUsername])
 );
@@ -83,6 +85,12 @@ router.put(
   validateReqBody(updateLoggedInUserPasswordSchema),
   requestHandler([updateLoggedInUserPassword])
 );
+router.put(
+  "/reset-pw-email",
+
+  validateReqBody(resetViaEmailSchema),
+  requestHandler([updatePWViaEmail])
+);
 
 router.put(
   "/username",
@@ -91,29 +99,13 @@ router.put(
   requestHandler([updateLoggedInUserUsername])
 );
 
+router.put(
+  "/changePfp",
+  authenticate,
+  multerUploader.fields([{ name: "photo", maxCount: 1 }]),
+  requestHandler([updateProfilePic])
+);
+
 router.delete("/", authenticate, requestHandler([deleteSelf]));
-
-// // // TODO: authenticate routes properly (Out of scope of day2)
-// router.put(
-//   "/",
-//   requestHandler([
-//     authenticate,
-//     // authorize("isAdmin"),
-//     validateReqQuery(DeleteUserByIDQuerySchema),
-//     validateReqBody(updateUserByIDBodySchema),
-//     updateUser,
-//   ])
-// );
-
-// router.delete(
-//   "/",
-//   requestHandler([
-//     authenticate,
-//     // authorize("isAdmin"),
-//     validateReqQuery(DeleteUserByIDQuerySchema),
-//     deleteUser,
-//   ])
-// );
-// router.put("/", authenticate, authorize("users.putSelf"), updateUserSelf);
 
 export default router;

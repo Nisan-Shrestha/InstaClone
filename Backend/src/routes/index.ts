@@ -20,5 +20,6 @@ router.use("/user", userRouter);
 router.use("/api", apiRouter);
 router.use("/posts", postRouter);
 router.use("/comments", commentRouter);
+
 //
 export default router;

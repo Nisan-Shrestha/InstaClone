@@ -1,26 +1,22 @@
 import express from "express";
-import config from "../config";
-import { sign } from "jsonwebtoken";
-
-const router = express();
 import {
-  googleLoginCallback,
   googleLogin,
-  login,
-  refresh,
+  googleLoginCallback,
   googleSignUp,
   googleSignUpCallback,
+  login,
+  logout,
+  refresh,
   signup,
 } from "../controller/Auth.Controller";
-import { validateReqBody, validateReqHeader } from "../middleware/validator";
-import {
-  loginSchema,
-  refreshSchema,
-  signupSchema,
-} from "../schema/Auth.Schema";
+import { validateReqBody } from "../middleware/validator";
+import { loginSchema, signupSchema } from "../schema/Auth.Schema";
 import { requestHandler } from "../utils/reqHandler";
 
+const router = express();
+
 router.post("/login", validateReqBody(loginSchema), requestHandler([login]));
+router.get("/logout", requestHandler([logout]));
 router.post("/signup", validateReqBody(signupSchema), requestHandler([signup]));
 router.get("/refresh", requestHandler([refresh]));
 

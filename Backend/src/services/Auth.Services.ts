@@ -24,7 +24,7 @@ export async function login(data: Pick<IUser, "username" | "password">) {
   const existingUser = await getUserByUsername(data.username);
 
   if (!existingUser) {
-    throw new NotFound("User does not exist with given email");
+    throw new NotFound("User does not exist with given username");
   }
   const isValidPassword = await bcryptjs.compare(
     data.password,
@@ -63,10 +63,13 @@ export async function login(data: Pick<IUser, "username" | "password">) {
     refreshToken,
     username: payload.username,
     pfpUrl: payload.pfpUrl,
+    promptUsernameChange: existingUser.id == existingUser.username,
   };
 }
 
 export async function signup(userInfo) {
+  userInfo.username = userInfo.username.toLowerCase();
+  userInfo.email = userInfo.email.toLowerCase();
   let existingUser = await getUserByEmail(userInfo.email);
   if (!existingUser) existingUser = await getUserByUsername(userInfo.username);
   if (existingUser) {
@@ -108,6 +111,7 @@ export async function signup(userInfo) {
     username: payload.username,
     pfpUrl: payload.pfpUrl,
     redirected: false,
+    promptUsernameChange: createdUser.id == createdUser.username,
   };
 }
 
@@ -122,8 +126,8 @@ export async function loginWithGoogle(code) {
       },
       body: JSON.stringify({
         code,
-        client_id: config.google.clientId,
-        client_secret: config.google.clientSecret,
+        client_id: config.G_OAuth.clientId,
+        client_secret: config.G_OAuth.clientSecret,
         redirect_uri: "http://localhost:8000/auth/login/google/callback",
         grant_type: "authorization_code",
       }),
@@ -140,7 +144,7 @@ export async function loginWithGoogle(code) {
   console.log("User Info: ", userInfo);
   let existingUser = await getUserByEmail(userInfo.email);
   if (!existingUser) {
-    throw new NotFound("User has not signed up with this gmail.");
+    return new NotFound("User has not signed up with this gmail.");
   }
   // const existingUser = await getUserByEmail(data.email);
   return { ...googleLoginReturn(existingUser) };
@@ -157,8 +161,8 @@ export async function signupWithGoogle(code) {
       },
       body: JSON.stringify({
         code,
-        client_id: config.google.clientId,
-        client_secret: config.google.clientSecret,
+        client_id: config.G_OAuth.clientId,
+        client_secret: config.G_OAuth.clientSecret,
         redirect_uri: "http://localhost:8000/auth/signup/google/callback",
         grant_type: "authorization_code",
       }),
@@ -194,6 +198,22 @@ export async function signupWithGoogle(code) {
   };
 }
 
+export async function resetLinkGenerate(email: string) {
+  const user: Partial<IUser> = await getUserByEmail(email);
+  if (!user) throw new NotFound("User with this email does not exist");
+  if (!config.jwt.secret) {
+    throw new Internal("Secret not Setup.");
+  }
+
+  let payload;
+  let expiry = 30 * 60 * 1000;
+  let resetToken = sign({ id: user.id }, config.jwt.secret, {
+    expiresIn: expiry.toString(),
+  });
+
+  return `${config.frontendUrl}/reset-password/token=${resetToken}`;
+}
+
 function googleLoginReturn(user: IUser) {
   const payload = {
     id: user.id,
@@ -220,5 +240,6 @@ function googleLoginReturn(user: IUser) {
     refreshToken,
     username: payload.username,
     pfpUrl: payload.pfpUrl,
+    promptUsernameChange: user.id == user.username,
   };
 }

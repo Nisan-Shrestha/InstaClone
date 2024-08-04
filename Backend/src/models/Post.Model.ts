@@ -17,36 +17,46 @@ const pathToUserData = path.join(__dirname, "../data/posts.json");
 const logger = loggerWithNameSpace("PostModel");
 
 export class PostModel extends BaseModel {
-  static count(filter: IGetPostPagedQuery) {
-    // const { q } = filter;
-    let query;
-    // if (q) {
-    //   query = this.queryBuilder()
-    //     .count("*")
-    //     .table("posts")
-    //     // .whereLike("name", `%${q}%`)
-    //     .first();
-    // } else
-    query = this.queryBuilder().count("*").table("posts").first();
+  static async getUserPostCount(userId: UUID): Promise<number> {
+    let query = await this.queryBuilder()
+      .count("*")
+      .table("posts")
+      .where("userId", userId)
+      .first();
 
-    return query;
+    return query.count;
+  }
+  static async getLikeCount(postId: UUID): Promise<number> {
+    let query = await this.queryBuilder()
+      .count("*")
+      .table("likes")
+      .where("postId", postId)
+      .first();
+
+    return query.count;
   }
 
-  static async getIfUserLikedPost(uid: UUID, pid: UUID): Promise<boolean> {
+  static async getIfUserLikedPost(
+    userId: UUID,
+    postId: UUID
+  ): Promise<boolean> {
     let query = await this.queryBuilder()
       .select("*")
       .table("likes")
-      .where("userId", uid)
-      .andWhere("postId", pid);
+      .where("userId", userId)
+      .andWhere("postId", postId);
     return query.length > 0;
   }
 
-  static async getIfUserSavedPost(uid: UUID, pid: UUID): Promise<boolean> {
+  static async getIfUserSavedPost(
+    userId: UUID,
+    postId: UUID
+  ): Promise<boolean> {
     let query = await this.queryBuilder()
       .select("*")
       .table("savedPosts")
-      .where("userId", uid)
-      .andWhere("postId", pid);
+      .where("userId", userId)
+      .andWhere("postId", postId);
     return query.length > 0;
   }
 
@@ -94,20 +104,6 @@ export class PostModel extends BaseModel {
     return query;
   }
 
-  // static getFilteredHashtagPosts(filter: IGetPostByHastagFilter) {
-  //   // const { q } = filter;
-  //   const query = this.queryBuilder()
-  //     .select("posts.*")
-  //     .table("posts")
-  //     .join("users", "posts.userId", "users.id")
-  //     .where("users.privacy", "Public")
-  //     .join("postHastags", "posts.id", "postHastags.postId")
-  //     .andWhereLike()
-  //     .limit(filter.size)
-  //     .offset((filter.page - 1) * filter.size);
-
-  //   return query;
-  // }
   static getFilteredHashtags(filter: IGetHashtagFilter) {
     // const { q } = filter;
     const query = this.queryBuilder()
@@ -120,14 +116,14 @@ export class PostModel extends BaseModel {
     return query;
   }
 
-  static getUserPostsPaged(uid: UUID, filter: IGetPostPagedQuery) {
+  static getUserPostsPaged(userId: UUID, filter: IGetPostPagedQuery) {
     let { page, size } = filter;
     if (page < 1) page = 1;
     if (size < 1) size = 1;
     const query = this.queryBuilder()
       .select("*")
       .table("posts")
-      .where("userId", uid)
+      .where("userId", userId)
       .limit(size)
       .offset((page - 1) * size);
 
@@ -161,8 +157,7 @@ export class PostModel extends BaseModel {
       })
       .table("posts")
       .returning("*");
-    // logger.info("run query: " + query.toString());
-    // await query;
+
     logger.info(query);
     return query[0];
   }

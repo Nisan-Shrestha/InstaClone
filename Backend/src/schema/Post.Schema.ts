@@ -2,8 +2,8 @@ import Joi from "joi";
 
 export const getPostSchema = Joi.object({
   id: Joi.string().required().messages({
-    "string.base": "username must be a string okay!",
-    "any.required": "username is required",
+    "string.base": "id must be a string okay!",
+    "any.required": "id is required",
   }),
 }).options({ stripUnknown: true });
 

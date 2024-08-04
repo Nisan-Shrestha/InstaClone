@@ -11,6 +11,9 @@ export interface IUser {
   pfpUrl: string | null;
   bio: string | null;
   phone: string | null;
+  followerCount?: number;
+  followingCount?: number;
+  postCount?: number;
 }
 
 export enum Roles {

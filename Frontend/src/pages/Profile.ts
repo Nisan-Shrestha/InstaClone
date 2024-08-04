@@ -49,10 +49,32 @@ export class Profile {
   async setup(mainContainer: HTMLDivElement, userInfo: Partial<IUser>) {
     mainContainer.querySelector("[data-username]")!.textContent =
       userInfo.username!;
-
-    mainContainer
-      .querySelector("[data-pfp]")!
-      .setAttribute("src", userInfo.pfpUrl!);
+    let pfpElem = mainContainer.querySelector("[data-pfp]") as HTMLImageElement;
+    pfpElem.setAttribute("src", userInfo.pfpUrl!);
+    pfpElem.parentElement!.addEventListener("click", () => {
+      let input = document.createElement("input");
+      input.setAttribute("type", "file");
+      input.setAttribute("accept", "image/*");
+      input.click();
+      input.addEventListener("change", async () => {
+        let file = input.files![0];
+        let formData = new FormData();
+        formData.append("photo", file);
+        console.log(
+          "hitting",
+          import.meta.env.VITE_BACKEND_URL + "/user/changePfp",
+        );
+        let response = await request({
+          url: import.meta.env.VITE_BACKEND_URL + "/user/changePfp",
+          method: "PUT",
+          body: formData,
+          other: { contentType: "multipart/form-data" },
+        });
+        if (response.status == "success") {
+          pfpElem.setAttribute("src", URL.createObjectURL(file));
+        }
+      });
+    });
     mainContainer.querySelector("[data-fullname]")!.textContent =
       userInfo.name!;
     mainContainer.querySelector("[data-bio]")!.textContent = userInfo.bio!;

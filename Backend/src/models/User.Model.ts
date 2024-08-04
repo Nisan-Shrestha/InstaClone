@@ -69,6 +69,9 @@ export class UserModel extends BaseModel {
   }
 
   static async createUser(user: Partial<IUser>) {
+    user.email = user.email.toLowerCase();
+    user.username = user.username.toLowerCase();
+
     const userExists = await UserModel.getUserByEmail(user.email);
     logger.info("user exists: " + !!userExists);
     if (userExists) {
@@ -140,23 +143,22 @@ export class UserModel extends BaseModel {
     return userToUpdate;
   }
 
-  static async updateLoggedInUserPassword(id: UUID, newHashedPassword: string) {
+  static async updateUserPW(id: UUID, newHashedPassword: string) {
     const query = await this.queryBuilder()
       .update("password", newHashedPassword)
       .table("users")
       .where({ id })
-      .returning("*")
-      .first();
-    return query;
+      .returning("*");
+    return query[0];
   }
+
   static async updateLoggedInUserUsername(id: UUID, newUsername: string) {
     const query = await this.queryBuilder()
       .update("username", newUsername)
       .table("users")
       .where({ id })
-      .returning("*")
-      .first();
-    return query;
+      .returning("*");
+    return query[0];
   }
 
   static async deleteUser(id: UUID) {
@@ -195,12 +197,12 @@ export class UserModel extends BaseModel {
     return result.length > 0;
   }
 
-  static async createFollow(idA: UUID, idB: UUID) {
+  static async createFollow(followerId: UUID, followingId: UUID) {
     let result = await this.queryBuilder()
       .insert({
         id: crypto.randomUUID(),
-        followerId: idA,
-        followingId: idB,
+        followerId: followerId,
+        followingId: followingId,
         createdAt: new Date(),
       })
       .table("follow")
@@ -209,18 +211,19 @@ export class UserModel extends BaseModel {
   }
   static async getFollowRequests(id: UUID) {
     let result = await this.queryBuilder()
-      .select("*")
-      .table("followRequests")
-      .where("requestedId", id);
+      .select("username", "name", "users.id as id", "pfpUrl")
+      .table("users")
+      .join("followRequests", "users.id", "followRequests.requesterId")
+      .where("followRequests.requestedId", id);
     return result;
   }
 
-  static async createFollowRequest(idA: UUID, idB: UUID) {
+  static async createFollowRequest(requesterId: UUID, requestedId: UUID) {
     let result = await this.queryBuilder()
       .insert({
         id: crypto.randomUUID(),
-        requesterId: idA,
-        requestedId: idB,
+        requesterId: requesterId,
+        requestedId: requestedId,
         createdAt: new Date(),
         status: "Pending",
       })
@@ -238,12 +241,12 @@ export class UserModel extends BaseModel {
       .returning("*");
     return result[0];
   }
-  static async deleteFollowRequest(idA: UUID, idB: UUID) {
+  static async deleteFollowRequest(requesterId: UUID, requestedId: UUID) {
     let result = await this.queryBuilder()
       .table("followRequests")
       .delete()
-      .where("requesterId", idA)
-      .andWhere("requestedId", idB)
+      .where("requesterId", requesterId)
+      .andWhere("requestedId", requestedId)
       .returning("*");
     return result[0];
   }
