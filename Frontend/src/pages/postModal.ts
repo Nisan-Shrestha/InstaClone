@@ -4,7 +4,7 @@ import { Comment, resetCommentInputType } from "../component/Comment";
 import { IComment } from "../interfaces/Comment.interface";
 import { IPost } from "../interfaces/Post.interface";
 import { router } from "../main";
-import { fetchView, request } from "../utils/utils";
+import { fetchView, getCookie, request } from "../utils/utils";
 
 export class PostModal {
   public static async load(postId: string) {
@@ -19,17 +19,13 @@ export class PostModal {
         "",
       );
     }
-    // if (window.history.state.currentTab != "homeFeed") {
-    //   document.getElementById("mainContainer")!.innerHTML = "";
-    //   window.history.replaceState(
-    //     { ...window.history.state, currentTab: "homeFeed" },
-    //     "",
-    //   );
-    // }
-    // window.history.replaceState(
-    //   { ...window.history.state, currentTab: "homeFeed" },
-    //   "",
-    // );
+    if (window.history.state.currentTab != "postModal") {
+      document.getElementById("mainContainer")!.innerHTML = "";
+      window.history.replaceState(
+        { ...window.history.state, currentTab: "postModal" },
+        "",
+      );
+    }
 
     let newPost = await fetchView("/component/PostModal.html");
     let container = document.createElement("div");
@@ -48,10 +44,12 @@ export class PostModal {
         },
       })
     ).payload;
-    if (!postDetails) {
-      router.navigate("/", window.history.state);
-      return;
-    }
+    console.log("postDetails:", postDetails);
+    // if (!postDetails) {
+    //   router.navigate("/", window.history.state);
+    //   return;
+    // }
+
     console.log("postDetails:", postDetails);
     let imgTag = container.querySelector("img[data-pfp]") as HTMLImageElement;
     if (postDetails.pfpUrl) imgTag.setAttribute("src", postDetails.pfpUrl);
@@ -63,11 +61,34 @@ export class PostModal {
       "[data-post-media]",
     ) as HTMLImageElement;
 
+    let current = 0;
     // TODO: convert to carousel
     if (postDetails.mediaUrl && postDetails.mediaUrl.length > 0) {
-      mediaElement.setAttribute("src", postDetails.mediaUrl[0]);
+      mediaElement.setAttribute("src", postDetails.mediaUrl[current]);
     }
 
+    let rightBtn = container.querySelector(
+      "[data-right-arrow]",
+    ) as HTMLImageElement;
+    let leftBtn = container.querySelector(
+      "[data-left-arrow]",
+    ) as HTMLImageElement;
+
+    if (postDetails.mediaUrl.length == 1) {
+      rightBtn.remove();
+      leftBtn.remove();
+    } else {
+      rightBtn.addEventListener("click", () => {
+        current++;
+        current %= postDetails.mediaUrl.length;
+        mediaElement.setAttribute("src", postDetails.mediaUrl[current]);
+      });
+      leftBtn.addEventListener("click", () => {
+        current--;
+        current = current < 0 ? postDetails.mediaUrl.length - 1 : current;
+        mediaElement.setAttribute("src", postDetails.mediaUrl[current]);
+      });
+    }
     const likeCount = container.querySelector(
       "[data-like-count]",
     ) as HTMLElement;
@@ -99,20 +120,15 @@ export class PostModal {
       "keydown",
       (event) => {
         if (event.key == "Escape") {
-          if (!window.history.state.currentTab)
-            router.navigate("/", window.history.state);
-          else window.history.back();
+          router.navigate("/", window.history.state);
         }
       },
       { once: true },
     );
     container.querySelector("[data-close-modal]")?.addEventListener(
       "click",
-      (event) => {
-        console.log("close");
-        if (!window.history.state.currentTab)
-          router.navigate("/", window.history.state);
-        else window.history.back();
+      () => {
+        router.navigate("/", window.history.state);
       },
       { once: true },
     );
@@ -124,11 +140,10 @@ export class PostModal {
       });
     });
 
-   
     const delBtn = container.querySelector(
       "[data-delete-post]",
     ) as HTMLButtonElement;
-    if (postDetails.username !== localStorage.getItem("username")) {
+    if (postDetails.username !== getCookie("username")) {
       delBtn.remove();
     }
     delBtn.addEventListener("click", async () => {
@@ -156,15 +171,16 @@ export class PostModal {
     const likeBtn = container.querySelector(
       "[data-like-button]",
     ) as HTMLButtonElement;
+    const likeCount = container.querySelector(
+      "[data-like-count]",
+    ) as HTMLElement;
 
+    likeCount.innerHTML = postDetails.likeCount?.toString() || "0";
     likeBtn.addEventListener("click", async () => {
       if (likeBtn.getAttribute("data-liked") == "false") {
         likeBtn.setAttribute("data-liked", "true");
         if (!postDetails.likeCount) postDetails.likeCount = 0;
         postDetails.likeCount++;
-        const likeCount = container.querySelector(
-          "[data-like-count]",
-        ) as HTMLElement;
         likeCount.innerHTML = postDetails.likeCount.toString();
         likeBtn
           .querySelector("img")
@@ -215,6 +231,10 @@ export class PostModal {
       ?.addEventListener("click", () => {
         navigator.clipboard.writeText(
           `${window.location.origin}/p/${postDetails.id}`,
+        );
+        alert(
+          "Post Share link copied to clipboard: \n" +
+            `${window.location.origin}/p/${postDetails.id}`,
         );
       });
 

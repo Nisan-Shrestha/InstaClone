@@ -1,11 +1,6 @@
 import { Post } from "../component/Post";
 import { IPost } from "../interfaces/Post.interface";
-import {
-  fetchView,
-  getCookie,
-  request,
-  updateNavbar,
-} from "../utils/utils";
+import { fetchView, request, updateNavbar } from "../utils/utils";
 
 export class HomeFeed {
   async load() {
@@ -31,7 +26,7 @@ export class HomeFeed {
       { ...window.history.state, currentTab: "homeFeed" },
       "",
     );
-    updateNavbar("home");
+    await updateNavbar("home");
 
     this.setup();
   }

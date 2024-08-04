@@ -2,13 +2,17 @@
 
 import { IPost } from "../interfaces/Post.interface";
 import { router } from "../main";
-import { fetchView, request } from "../utils/utils";
+import { fetchView, getCookie, request } from "../utils/utils";
 
 export class Post {
   public static async createAndAppend(
     postDetails: Partial<IPost>,
     parentDiv: HTMLElement,
   ) {
+    if (!postDetails.mediaUrl) {
+      router.navigate("/", window.history.state);
+      return;
+    }
     let newPost = await fetchView("/component/Post.html");
     let container = document.createElement("div");
     container.setAttribute("class", "w-6/12 max-w-xl min-w-64");
@@ -26,9 +30,32 @@ export class Post {
       "[data-post-media]",
     ) as HTMLImageElement;
 
-    // TODO: convert to carousel
+    let current = 0;
     if (postDetails.mediaUrl && postDetails.mediaUrl.length > 0) {
-      mediaElement.setAttribute("src", postDetails.mediaUrl[0]);
+      mediaElement.setAttribute("src", postDetails.mediaUrl[current]);
+    }
+
+    let rightBtn = container.querySelector(
+      "[data-right-arrow]",
+    ) as HTMLImageElement;
+    let leftBtn = container.querySelector(
+      "[data-left-arrow]",
+    ) as HTMLImageElement;
+
+    if (postDetails.mediaUrl.length == 1) {
+      rightBtn.remove();
+      leftBtn.remove();
+    } else {
+      rightBtn.addEventListener("click", () => {
+        current++;
+        current %= postDetails.mediaUrl!.length;
+        mediaElement.setAttribute("src", postDetails.mediaUrl![current]);
+      });
+      leftBtn.addEventListener("click", () => {
+        current--;
+        current = current < 0 ? postDetails.mediaUrl!.length - 1 : current;
+        mediaElement.setAttribute("src", postDetails.mediaUrl![current]);
+      });
     }
 
     const likeCount = container.querySelector(
@@ -69,7 +96,7 @@ export class Post {
     const delBtn = container.querySelector(
       "[data-delete-post]",
     ) as HTMLButtonElement;
-    if (postDetails.username !== localStorage.getItem("username")) {
+    if (postDetails.username !== getCookie("username")) {
       delBtn.remove();
     }
     delBtn.addEventListener("click", async () => {
@@ -159,6 +186,10 @@ export class Post {
       ?.addEventListener("click", () => {
         navigator.clipboard.writeText(
           `${window.location.origin}/p/${postDetails.id}`,
+        );
+        alert(
+          "Post Share link copied to clipboard: \n" +
+            `${window.location.origin}/p/${postDetails.id}`,
         );
       });
 

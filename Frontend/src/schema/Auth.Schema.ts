@@ -1,16 +1,35 @@
 import Joi from "joi";
 
+export const UsernameSchema = Joi.object({
+  username: Joi.string().required().min(4).messages({
+    "string.empty": "Username is required",
+    "string.min": "Username must be at least 4 characters",
+  }),
+}).options({ stripUnknown: true });
+
+export const loginSchema = Joi.object({
+  username: Joi.string().required().min(4).messages({
+    "string.empty": "Username is required",
+    "string.min": "Username must be at least 4 characters",
+  }),
+  password: Joi.string().required().min(8).messages({
+    "string.empty": "Password is required",
+    "string.min": "Password must be at least 8 characters",
+  }),
+}).options({ stripUnknown: true });
+
+export const emailSchema = Joi.object({
+  email: Joi.string().email({ tlds: false }).required().messages({
+    "string.empty": "Email is required",
+    "string.email": "Email must be a valid email",
+  }),
+}).options({ stripUnknown: true });
+
 export const signupSchema = Joi.object({
-  username: Joi.string()
-    .required()
-    .pattern(/^[a-zA-Z0-9.]+$/)
-    .min(4)
-    .messages({
-      "string.empty": "Username is required",
-      "string.min": "Username must be at least 4 characters",
-      "string.pattern.base":
-        "Username must only contain alphanumeric characters and periods '.'.",
-    }),
+  username: Joi.string().required().min(4).messages({
+    "string.empty": "Username is required",
+    "string.min": "Username must be at least 4 characters",
+  }),
   name: Joi.string()
     .required()
     .pattern(/^[a-zA-Z0-9 ]+$/)

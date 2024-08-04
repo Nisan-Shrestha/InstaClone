@@ -3,14 +3,14 @@
 import { IPost } from "../interfaces/Post.interface";
 import { FollowStatus, IUser } from "../interfaces/User.interface";
 import { router } from "../main";
-import { fetchView, request } from "../utils/utils";
+import { fetchView, getCookie, request } from "../utils/utils";
 
 export class RequestSummary {
   public static async create(
     userDetails: Partial<IUser>,
     parentDiv: HTMLElement,
   ) {
-    let newUser = await fetchView("/component/UserSummary.html");
+    let newUser = await fetchView("/component/UserRequestSummary.html");
 
     let container = document.createElement("div");
 
@@ -39,98 +39,98 @@ export class RequestSummary {
     profileBtn.addEventListener("click", async () => {
       router.navigate(`/u/${userDetails.username}`, window.history.state);
     });
-    let followBtn = container.querySelector(
-      "button[data-follow-btn]",
+
+    let acceptBtn = container.querySelector(
+      "button[data-accept-btn]",
     ) as HTMLButtonElement;
-    if (userDetails.username == localStorage.getItem("username")) {
-      followBtn.style.display = "none";
-      return;
-    }
-    console.log(userDetails.following);
-    if (userDetails.following == FollowStatus.Notfollowing) {
-      followBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
-      followBtn.classList.remove("bg-red-600", "hover:bg-red-700");
-      followBtn.innerText = "Follow";
-      followBtn.addEventListener(
-        "click",
-        async () => this.follow(userDetails, followBtn),
-        { once: true },
-      );
-    } else {
-      followBtn.classList.remove("bg-blue-600", "hover:bg-blue-700");
-      followBtn.classList.add("bg-red-600", "hover:bg-red-700");
-      if (userDetails.following == FollowStatus.Following)
-        followBtn.innerText = "Unfollow";
-      else if (userDetails.following == FollowStatus.Pending)
-        followBtn.innerText = "Remove Request";
+    let rejectBtn = container.querySelector(
+      "button[data-reject-btn]",
+    ) as HTMLButtonElement;
 
-      followBtn.addEventListener(
-        "click",
-        async () => this.unfollow(userDetails, followBtn),
-        { once: true },
-      );
-    }
+    acceptBtn.addEventListener(
+      "click",
+      async () => {
+        acceptBtn.disabled = true;
+        acceptBtn.classList.add("cursor-not-allowed", "bg-indigo-700");
+        acceptBtn.classList.remove("hover:bg-blue-700", "bg-blue-600");
+        acceptBtn.innerText = "Following";
+        rejectBtn.hidden = true;
+        let result = await this.accept(userDetails);
+        if (!result) {
+          acceptBtn.disabled = false;
+          acceptBtn.classList.remove("cursor-not-allowed", "bg-indigo-700");
+          acceptBtn.classList.add("hover:bg-blue-700", "bg-blue-600");
+          acceptBtn.innerText = "Accept";
+        }
+      },
+      {
+        once: true,
+      },
+    );
+    rejectBtn.addEventListener(
+      "click",
+      async () => {
+        acceptBtn.disabled = true;
+        acceptBtn.classList.add(
+          "cursor-not-allowed",
+          "bg-neutral-100",
+          "text-red-500",
+          "border-red-500",
+          "border-2",
+        );
+        acceptBtn.classList.remove("hover:bg-blue-700", "bg-blue-600");
+        acceptBtn.innerText = "Rejected";
+        rejectBtn.hidden = true;
+        let result = await this.reject(userDetails);
+        if (!result) {
+          acceptBtn.disabled = false;
+          acceptBtn.classList.remove(
+            "cursor-not-allowed",
+            "bg-neutral-100",
+            "text-red-500",
+            "border-red-500",
+            "border-2",
+          );
+          acceptBtn.classList.add("hover:bg-blue-700", "bg-blue-600");
+          acceptBtn.innerText = "Accept";
+        }
+      },
+      {
+        once: true,
+      },
+    );
   }
-  static async follow(
-    userDetails: Partial<IUser>,
-    followBtn: HTMLButtonElement,
-  ) {
+
+  static async accept(userDetails: Partial<IUser>) {
     let response = await request({
       url:
         import.meta.env.VITE_BACKEND_URL +
-        `/api/follow/${userDetails.username}`,
-      method: "POST",
+        `/api/follow-requests/${userDetails.username}?decision=Accepted`,
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
     });
     if (response.status !== "success") {
-      // TODO:
-      console.log("Error following user");
-      return;
+      return false;
     }
-    followBtn.classList.remove("bg-blue-600", "hover:bg-blue-700");
-    followBtn.classList.add("bg-red-600", "hover:bg-red-700");
-
-    if (response.payload.followResult == "requested") {
-      followBtn.innerText = "Remove Request";
-    } else if (response.payload.followResult == "followed") {
-      followBtn.innerText = "Unfollow";
-    }
-    followBtn.addEventListener(
-      "click",
-      async () => this.unfollow(userDetails, followBtn),
-      { once: true },
-    );
-
-    // router.navigate(`/u/${userDetails.username}`, window.history.state);
+    return true;
   }
 
-  static async unfollow(
-    userDetails: Partial<IUser>,
-    followBtn: HTMLButtonElement,
-  ) {
+  static async reject(userDetails: Partial<IUser>) {
     let response = await request({
       url:
         import.meta.env.VITE_BACKEND_URL +
-        `/api/unfollow/${userDetails.username}`,
-      method: "DELETE",
+        `/api/follow-requests/${userDetails.username}?decision=Rejected`,
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
     });
+    console.log('response:', response)
     if (response.status !== "success") {
-      console.log("Error following user");
-      return;
+      return false;
     }
-    followBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
-    followBtn.classList.remove("bg-red-600", "hover:bg-red-700");
-    followBtn.innerText = "Follow";
-    followBtn.addEventListener(
-      "click",
-      async () => this.follow(userDetails, followBtn),
-      { once: true },
-    );
-    // router.navigate(`/u/${userDetails.username}`, window.history.state);
+    return true;
   }
 }

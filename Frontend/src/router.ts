@@ -58,7 +58,9 @@ class Router {
     history.pushState({ ...state }, "", path);
 
     const route =
-      this.routes.find((r) => r.pattern.test(path)) || this.routes[0];
+      this.routes.find((r) => r.pattern.test(path)) ||
+      this.routes.find((r) => r.pattern.test("/notFound")) ||
+      this.routes[0];
     const params = this.getParams(route, path);
     console.log(route, params);
 

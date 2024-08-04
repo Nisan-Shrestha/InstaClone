@@ -10,6 +10,9 @@ export interface IUser {
   bio: string | null;
   phone: string | null;
   following?: FollowStatus;
+  followerCount?: number;
+  followingCount?: number;
+  postCount?: number;
 }
 
 export interface GetUserQuery {

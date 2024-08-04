@@ -1,4 +1,4 @@
-import { loginSchema } from "../schema/login.Schema";
+import { emailSchema, loginSchema } from "../schema/Auth.Schema";
 import { fetchView, request } from "../utils/utils";
 
 export class Login {
@@ -30,6 +30,43 @@ export class Login {
   }
 
   setup() {
+    //Forget Pw Handler
+    document
+      .getElementById("forgotPW")!
+      .addEventListener("click", async (e) => {
+        e.preventDefault();
+        let email = prompt("Please enter your email address");
+        let { error } = emailSchema.validate({ email });
+        console.log("Error:", error);
+        while (error && email) {
+          if (error) {
+            email = prompt("Invalid Email Please enter your email address");
+            error = emailSchema.validate(email).error;
+
+            console.log("Invalid email:", error!.message);
+            return;
+          }
+        }
+        if (!email) {
+          alert("Seems like you remembered your password.\nEmail not sent.");
+        }
+        if (email) {
+          let res = await request({
+            url: import.meta.env.VITE_BACKEND_URL + "/utils/resetRequest",
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: { email },
+          });
+          if (res.status == "success") {
+            alert("Email sent to " + email);
+          } else {
+            alert("Error: " + res.message);
+          }
+        }
+      });
+
     document
       .getElementById("loginform")!
       .addEventListener("submit", async function (event) {
@@ -41,34 +78,13 @@ export class Login {
         document.getElementById("usernameError")!.textContent = "";
         document.getElementById("passwordError")!.textContent = "";
 
-        // Validate username
-
         const username = (
           document.getElementById("login_username") as HTMLInputElement
         ).value;
-        let { error: usernameError } = loginSchema
-          .extract("username")
-          .validate(username);
-        if (usernameError) {
-          (
-            document.getElementById("usernameError") as HTMLElement
-          ).textContent = usernameError.message;
-          error = true;
-        }
 
         const password = (
           document.getElementById("login_password") as HTMLInputElement
         ).value;
-        const { error: passwordError } = loginSchema
-          .extract("password")
-          .validate(password);
-        if (passwordError) {
-          (
-            document.getElementById("passwordError") as HTMLElement
-          ).textContent = passwordError.message;
-          error = true;
-        }
-        localStorage.setItem("username", username);
 
         if (!error) {
           const response = await request(
@@ -83,12 +99,12 @@ export class Login {
             true,
           );
           if (response.status === "success") {
+            console.log(response);
           }
 
           if (response.status === "error") {
-            // TODO: implement error toast
+            alert("Error: somethings not right, maybe your password?" );
           }
-          // TODO: check if this works as expected.
         }
       });
   }

@@ -2,19 +2,29 @@ import { Create } from "./pages/Create";
 import { Explore } from "./pages/Explore";
 import { HomeFeed } from "./pages/Home";
 import { Login } from "./pages/Login";
+import { NotFound } from "./pages/NotFound";
 import { PostModal } from "./pages/postModal";
 import { Profile } from "./pages/Profile";
+import { RequestPage } from "./pages/Requests";
+import { Reset } from "./pages/Reset";
 import { Search } from "./pages/Search";
 import { Signup } from "./pages/Signup";
 import Router from "./router";
 
 export const router = new Router();
 
+router.addRoute("/notFound", async () => {
+  await new NotFound().load();
+});
+
 router.addRoute("/", async () => {
   await new HomeFeed().load();
 });
 router.addRoute("/search", async () => {
   await new Search().load();
+});
+router.addRoute("/requests", async () => {
+  await new RequestPage().load();
 });
 router.addRoute("/login", async () => {
   await new Login().load();
@@ -24,6 +34,11 @@ router.addRoute("/signup", async () => {
 });
 router.addRoute("/create", async () => {
   await Create.load();
+});
+router.addRoute("/reset-password/:token", async (params) => {
+  if (params) {
+    await new Reset().load(params.token);
+  }
 });
 router.addRoute("/explore/:tag", async (params) => {
   if (params) {

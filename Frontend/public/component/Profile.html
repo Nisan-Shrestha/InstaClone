@@ -16,6 +16,14 @@
               Edit Profile
             </button>
           </span>
+          <span class="mr-2 text-base font-semibold text-gray-700">
+            <button
+              data-follow-btn
+              class="my-auto me-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300"
+            >
+              Follow
+            </button>
+          </span>
         </div>
 
         <div class="pl-4 pt-3 text-left">
@@ -99,5 +107,104 @@
         <!-- insert posts -->
       </div>
     </div>
+  </div>
+</div>
+<div class="hidden" id="edit-modal">
+  <div
+    class="fixed left-0 top-0 h-dvh w-lvw bg-slate-500 bg-opacity-10 backdrop-blur-lg"
+  ></div>
+  <div
+    class="absolute left-1/2 top-1/2 w-11/12 -translate-x-1/2 -translate-y-1/2 md:w-1/4"
+  >
+    <form class="space-y-6" id="editForm">
+      <div>
+        <label
+          for="edit-username"
+          class="text-md block font-medium leading-6 text-gray-900"
+          >Username</label
+        >
+        <div>
+          <input
+            type="text"
+            name="username"
+            id="edit-username"
+            placeholder="akaMark"
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          />
+          <span
+            id="usernameError"
+            class="hidden w-full rounded-md py-0.5 text-red-700 sm:text-sm sm:leading-6"
+          ></span>
+        </div>
+      </div>
+      <div>
+        <label
+          for="edit-name"
+          class="text-md block font-medium leading-6 text-gray-900"
+          >Full Name</label
+        >
+        <div>
+          <input
+            type="text"
+            name="fullname"
+            id="edit-name"
+            placeholder="Mark Tally"
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          />
+          <span
+            id="fullnameError"
+            class="hidden w-full rounded-md py-0.5 text-red-700 sm:text-sm sm:leading-6"
+          ></span>
+        </div>
+      </div>
+      <div>
+        <label
+          for="edit-bio"
+          class="text-md block font-medium leading-6 text-gray-900"
+          >Bio</label
+        >
+        <div>
+          <textarea
+            type="text"
+            name="bio"
+            id="edit-bio"
+            placeholder="Here should be short description about yourself."
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          ></textarea>
+        </div>
+      </div>
+      <div>
+        <label
+          for="edit-privacy"
+          class="text-md block font-medium leading-6 text-gray-900"
+          >Privacy</label
+        >
+        <div>
+          <select
+            name="privacy"
+            id="edit-privacy"
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          >
+            <option value="Public">Public</option>
+            <option value="Private">Private</option>
+          </select>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        id="submitEdit"
+        class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+      >
+        Update Details
+      </button>
+      <button
+        type="button"
+        id="cancelEdit"
+        class="flex w-full justify-center rounded-md bg-red-600 px-3 py-1 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+      >
+        Cancel
+      </button>
+    </form>
   </div>
 </div>

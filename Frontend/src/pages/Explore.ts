@@ -41,7 +41,7 @@ export class Explore {
       heading.innerText = `#${tag}`;
       mainContainer.prepend(heading);
     }
-    updateNavbar("explore");
+    await updateNavbar("explore");
 
     this.setup(mainContainer, tag);
   }

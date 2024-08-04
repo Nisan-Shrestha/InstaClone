@@ -1,6 +1,5 @@
 // import { fetchView } from "../utils/utils";
 import "cropperjs/dist/cropper.css";
-
 import { router } from "../main";
 import { fetchView, request } from "../utils/utils";
 import Cropper from "cropperjs";
@@ -97,7 +96,7 @@ export class Create {
 
       const img = document.createElement("img");
       img.src = image.preview;
-      img.className = "w-24 h-24 object-cover rounded";
+      img.className = "w-48 h-48 object-cover rounded";
       img.addEventListener("click", () => this.openCropper(images, index));
 
       const removeBtn = document.createElement("button");

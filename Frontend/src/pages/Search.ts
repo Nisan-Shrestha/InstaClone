@@ -19,13 +19,13 @@ export class Search {
         "",
       );
     }
-    // if (window.history.state.currentTab != "search") {
-    //   document.getElementById("mainContainer")!.innerHTML = "";
-    //   window.history.replaceState(
-    //     { ...window.history.state, currentTab: "search" },
-    //     "",
-    //   );
-    // }
+    if (window.history.state.currentTab != "search") {
+      document.getElementById("mainContainer")!.innerHTML = "";
+      window.history.replaceState(
+        { ...window.history.state, currentTab: "search" },
+        "",
+      );
+    }
     const mainContainer = document.getElementById(
       "mainContainer",
     ) as HTMLElement;
@@ -37,17 +37,7 @@ export class Search {
 
     let view = await fetchView("/component/Search.html");
     mainContainer.innerHTML = view;
-    // let user = await fetchView("/component/UserSummary.html");
-    let resultsContainer = document.getElementById("searchResults")!;
-    let user: Partial<IUser> = {
-      username: "akaMark2",
-      name: "Mark Manson",
-      pfpUrl:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-y-fFn8KjGMJWwHyFA32_Xvysu-c0c3pHIw&s",
-      following: FollowStatus.Following,
-    };
-    // UserSummary.create(user, resultsContainer);
-    updateNavbar("search");
+    await updateNavbar("search");
 
     this.setup();
   }

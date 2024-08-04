@@ -12,12 +12,20 @@
   class="fixed left-1/2 top-1/2 w-3/4 -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-white shadow-none"
 >
   <div class="grid h-auto min-w-full grid-cols-3 opacity-100">
-    <!-- TODO: add carousel here -->
-
     <div
       data-carousel
-      class="col-span-2 flex aspect-square h-auto w-full self-center overflow-hidden"
+      class="relative col-span-2 flex aspect-square h-auto w-full self-center overflow-hidden"
     >
+      <img
+        data-right-arrow
+        src="/assets/icons/right.png"
+        class="absolute right-0 top-1/2 cursor-pointer rounded-full p-4 text-center text-5xl text-neutral-50"
+      />
+      <img
+        data-left-arrow
+        src="/assets/icons/left.png"
+        class="absolute left-0 top-1/2 cursor-pointer rounded-full p-4 text-center text-5xl text-neutral-50"
+      />
       <img
         data-post-media
         class="aspect-square h-auto w-full min-w-full max-w-full object-cover"

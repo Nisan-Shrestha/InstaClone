@@ -21,16 +21,34 @@
       </a>
       <button
         data-delete-post
-        class="block bg-red-600 my-auto p-2 rounded-md text-neutral-200 hover:bg-red-500"
+        class="my-auto block rounded-md bg-red-600 p-2 text-neutral-200 hover:bg-red-500"
       >
         Delete Post
       </button>
     </div>
-    <!--TODO add carousel here -->
-    <div data-carousel-holder class="aspect-square h-3/4 w-auto">
-      <img data-post-media class="h-auto w-full object-contain" src="" />
+
+    <div
+      data-carousel
+      class="relative col-span-2 flex aspect-square h-auto w-full self-center overflow-hidden"
+    >
+      <img
+        data-right-arrow
+        src="/assets/icons/right.png"
+        class="absolute right-0 top-1/2 cursor-pointer rounded-full p-4 text-center text-5xl text-neutral-50"
+      />
+      <img
+        data-left-arrow
+        src="/assets/icons/left.png"
+        class="absolute left-0 top-1/2 cursor-pointer rounded-full p-4 text-center text-5xl text-neutral-50"
+      />
+      <img
+        data-post-media
+        class="aspect-square h-auto w-full min-w-full max-w-full object-cover"
+        src=""
+        alt="Description"
+      />
     </div>
-    <!-- carousel end -->
+
     <div class="mx-4 mb-2 mt-3 flex items-center justify-between">
       <div class="flex gap-5">
         <button data-like-button data-liked="false">
